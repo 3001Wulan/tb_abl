@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PembimbingController;
+
 use App\Http\Controllers\PendaftaranKPController;
 use App\Http\Controllers\InformasiKPController;
 use App\Http\Controllers\SyaratKPController;
@@ -10,10 +11,14 @@ use App\Http\Controllers\TemplateDokumenController;
 use App\Http\Controllers\ProsedurKPController;
 use App\Http\Controllers\VerifikasiAdministrasiController;
 use App\Http\Controllers\SuratPengantarKPController;
+use App\Http\Controllers\SeminarController;
+
+
 
 Route::post('/tentukan-pembimbing', [PembimbingController::class, 'tentukanPembimbing']);
 Route::post('/buat-surat-tugas', [PembimbingController::class, 'buatSuratTugas']);
 Route::get('/kirim-notifikasi/{id}', [PembimbingController::class, 'kirimNotifikasi']);
+
 Route::post('/pendaftaran-kp', [PendaftaranKPController::class, 'daftar']);
 Route::post('/pendaftaran-kp/{id}/upload', [PendaftaranKPController::class, 'uploadBerkas']);
 Route::post('/pendaftaran-kp/{id}/validasi', [PendaftaranKPController::class, 'validasi']);
@@ -40,3 +45,9 @@ Route::post('/surat-pengantar/{id}/tandatangani', [SuratPengantarKPController::c
 Route::post('/surat-pengantar/{id}/tolak', [SuratPengantarKPController::class, 'tolak']);
 Route::get('/surat-pengantar/{id}/download', [SuratPengantarKPController::class, 'download']);
 Route::get('/surat-pengantar/{id}/status', [SuratPengantarKPController::class, 'getStatus']);
+
+
+Route::apiResource('seminars', SeminarController::class);
+Route::post('seminars/{seminar}/assign-examiners', [SeminarController::class, 'assignExaminers']);
+Route::post('seminars/{seminar}/notify', [SeminarController::class, 'notify']);
+
