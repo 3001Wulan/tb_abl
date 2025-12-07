@@ -12,6 +12,7 @@ use App\Http\Resources\SeminarResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SeminarController extends Controller
 {
@@ -27,60 +28,96 @@ class SeminarController extends Controller
         return new SeminarResource($seminar);
     }
 
-   public function store(StoreSeminarRequest $request)
-{
-    // 1. Insert seminar dulu
-    $seminar = Seminar::create($request->only(['title','student_id','scheduled_at','notes']));
+    public function store(StoreSeminarRequest $request)
+    {
+        // 1. Insert seminar dulu
+        $seminar = Seminar::create($request->only(['title','student_id','scheduled_at','notes']));
 
-    // 2. Attach examiners jika ada
-    if ($request->filled('examiners')) {
-        foreach ($request->examiners as $ex) {
-            if (\App\Models\User::find($ex['id'])) {
-                $seminar->examiners()->attach($ex['id'], ['role' => $ex['role'] ?? 'primary']);
+        // 2. Attach examiners jika ada
+        if ($request->filled('examiners')) {
+            foreach ($request->examiners as $ex) {
+                if (User::find($ex['id'])) {
+                    $seminar->examiners()->attach($ex['id'], ['role' => $ex['role'] ?? 'primary']);
+                }
             }
         }
-    }
 
-    // 3. Send notification
-    try {
-        $targets = collect();
-        $targets->push($seminar->student);
-        $targets = $targets->merge($seminar->examiners);
-        Notification::send($targets->unique('id'), new SeminarScheduled($seminar, 'Seminar telah dijadwalkan.'));
-    } catch (\Exception $e) {
-        // notification gagal tidak menggagalkan insert
-    }
+        // 3. Load relationships sebelum notifikasi
+        $seminar->load(['student', 'examiners']);
 
-    return (new SeminarResource($seminar->load(['student','examiners'])))->response()->setStatusCode(201);
-}
+        // 4. Send notification
+        try {
+            $targets = collect();
+            
+            if ($seminar->student) {
+                $targets->push($seminar->student);
+            }
+            
+            if ($seminar->examiners->isNotEmpty()) {
+                $targets = $targets->merge($seminar->examiners);
+            }
+            
+            if ($targets->isNotEmpty()) {
+                Notification::send($targets->unique('id'), new SeminarScheduled($seminar, 'Seminar telah dijadwalkan.'));
+            }
+        } catch (\Exception $e) {
+            // notification gagal tidak menggagalkan insert
+            Log::error('Failed to send seminar notification: ' . $e->getMessage());
+        }
+
+        return (new SeminarResource($seminar))->response()->setStatusCode(201);
+    }
 
     public function update(UpdateSeminarRequest $request, Seminar $seminar)
-{
-    return DB::transaction(function () use ($request, $seminar) {
-        $seminar->update($request->only(['title','scheduled_at','notes','status']));
+    {
+        return DB::transaction(function () use ($request, $seminar) {
+            // Update seminar (tambahkan student_id jika student bisa diubah)
+            $seminar->update($request->only([
+                'title',
+                'student_id',
+                'scheduled_at',
+                'notes',
+                'status'
+            ]));
 
-        if ($request->has('examiners')) {
-            $syncData = [];
-            foreach ($request->examiners as $ex) {
-                $syncData[$ex['id']] = ['role' => $ex['role'] ?? 'primary'];
+            // Sync examiners jika ada di request
+            if ($request->has('examiners')) {
+                $syncData = [];
+                foreach ($request->examiners as $ex) {
+                    $syncData[$ex['id']] = ['role' => $ex['role'] ?? 'primary'];
+                }
+                $seminar->examiners()->sync($syncData);
             }
-            $seminar->examiners()->sync($syncData);
-        }
 
-        // Notifikasi aman untuk semua kasus
-        $targets = collect();
-if ($seminar->student) $targets->push($seminar->student);
-if ($seminar->examiners) $targets = $targets->merge($seminar->examiners);
+            // Load relationships sebelum notifikasi
+            $seminar->load(['student', 'examiners']);
 
-Notification::send(
-    $targets->unique('id'), 
-    new SeminarScheduled($seminar, 'Ada perubahan pada jadwal seminar.')
-);
+            // Kirim notifikasi dengan error handling
+            try {
+                $targets = collect();
+                
+                if ($seminar->student) {
+                    $targets->push($seminar->student);
+                }
+                
+                if ($seminar->examiners->isNotEmpty()) {
+                    $targets = $targets->merge($seminar->examiners);
+                }
 
+                if ($targets->isNotEmpty()) {
+                    Notification::send(
+                        $targets->unique('id'), 
+                        new SeminarScheduled($seminar, 'Ada perubahan pada jadwal seminar.')
+                    );
+                }
+            } catch (\Exception $e) {
+                // Log error tapi tidak gagalkan update
+                Log::error('Failed to send seminar update notification: ' . $e->getMessage());
+            }
 
-        return new SeminarResource($seminar->load(['student','examiners']));
-    });
-}
+            return new SeminarResource($seminar);
+        });
+    }
 
     public function destroy(Seminar $seminar)
     {
@@ -103,32 +140,64 @@ Notification::send(
         }
         $seminar->examiners()->sync($syncData);
 
+        // Load relationships
+        $seminar->load(['student', 'examiners']);
+
         // notify
-        $targets = $seminar->examiners;
-        $targets->push($seminar->student);
+        try {
+            $targets = collect();
+            
+            if ($seminar->student) {
+                $targets->push($seminar->student);
+            }
+            
+            if ($seminar->examiners->isNotEmpty()) {
+                $targets = $targets->merge($seminar->examiners);
+            }
 
-        Notification::send($targets->unique('id'), new SeminarScheduled($seminar, 'Anda ditunjuk sebagai penguji seminar.'));
+            if ($targets->isNotEmpty()) {
+                Notification::send($targets->unique('id'), new SeminarScheduled($seminar, 'Anda ditunjuk sebagai penguji seminar.'));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send examiner assignment notification: ' . $e->getMessage());
+        }
 
-        return new SeminarResource($seminar->load(['student','examiners']));
+        return new SeminarResource($seminar);
     }
 
     // Endpoint khusus: notify manually with custom message
-  public function notify(Request $request, Seminar $seminar)
-{
-    $data = $request->validate(['message' => 'required|string|max:1000']);
+    public function notify(Request $request, Seminar $seminar)
+    {
+        $data = $request->validate(['message' => 'required|string|max:1000']);
 
-    $targets = $seminar->examiners;
-    $targets->push($seminar->student);
+        // Load relationships
+        $seminar->load(['student', 'examiners']);
 
-    try {
-        Notification::send($targets->unique('id'), new SeminarScheduled($seminar, $data['message']));
-        return response()->json(['message' => 'Notifikasi dikirim'], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Gagal mengirim notifikasi',
-            'error' => $e->getMessage()
-        ], 500);
+        $targets = collect();
+        
+        if ($seminar->student) {
+            $targets->push($seminar->student);
+        }
+        
+        if ($seminar->examiners->isNotEmpty()) {
+            $targets = $targets->merge($seminar->examiners);
+        }
+
+        if ($targets->isEmpty()) {
+            return response()->json([
+                'message' => 'Tidak ada target notifikasi (student atau examiner tidak ditemukan)'
+            ], 400);
+        }
+
+        try {
+            Notification::send($targets->unique('id'), new SeminarScheduled($seminar, $data['message']));
+            return response()->json(['message' => 'Notifikasi dikirim'], 200);
+        } catch (\Exception $e) {
+            Log::error('Failed to send manual notification: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Gagal mengirim notifikasi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-}
-
 }
