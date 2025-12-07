@@ -23,8 +23,13 @@ class Seminar extends Model
 
     public function examiners(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\User::class, 'seminar_examiners', 'seminar_id', 'examiner_id')
-                    ->withPivot('role')
-                    ->withTimestamps();
+        return $this->belongsToMany(
+            \App\Models\User::class,      
+            'seminar_examiners',        
+            'seminar_id',               
+            'examiner_id'              
+        )
+        ->withPivot('role')
+        ->withTimestamps();
     }
 }
