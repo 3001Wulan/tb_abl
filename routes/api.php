@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PembimbingController;
+use App\Http\Controllers\KonsultasiController;
+use App\Http\Controllers\LogbookController;
+use App\Http\Controllers\ValidasiController;
+
 
 use App\Http\Controllers\PendaftaranKPController;
 use App\Http\Controllers\InformasiKPController;
@@ -13,11 +17,40 @@ use App\Http\Controllers\VerifikasiAdministrasiController;
 use App\Http\Controllers\SuratPengantarKPController;
 use App\Http\Controllers\SeminarController;
 use App\Http\Controllers\PengajuanTempatKPController;
+use App\Http\Controllers\EvaluasiKPController;
+
+
 
 
 Route::post('/tentukan-pembimbing', [PembimbingController::class, 'tentukanPembimbing']);
 Route::post('/buat-surat-tugas', [PembimbingController::class, 'buatSuratTugas']);
 Route::get('/kirim-notifikasi/{id}', [PembimbingController::class, 'kirimNotifikasi']);
+Route::get('/download-surat-tugas/{id}', [PembimbingController::class, 'downloadSuratTugas']);
+Route::delete('/delete-surat-tugas/{id}', [PembimbingController::class, 'deleteSuratTugas']);
+Route::put('/update-pembimbing/{id}', [PembimbingController::class, 'updatePembimbing']);
+
+Route::get('jadwal-bimbingan', [KonsultasiController::class,'indexJadwal']);
+Route::post('jadwal-bimbingan', [KonsultasiController::class,'storeJadwal']);
+
+// Forum Konsultasi
+Route::get('forum', [KonsultasiController::class,'indexForum']);
+Route::post('forum', [KonsultasiController::class,'storeForum']);
+Route::post('forum/{id}/komentar', [KonsultasiController::class,'storeKomentar']);
+
+// Catatan Bimbingan
+Route::get('catatan-bimbingan/{studentId}', [KonsultasiController::class,'indexCatatan']);
+Route::post('catatan-bimbingan', [KonsultasiController::class,'storeCatatan']);
+
+Route::post('logbook', [LogbookController::class, 'storeLogbook']);
+Route::get('logbook/{studentId}', [LogbookController::class, 'indexLogbook']);
+Route::post('logbook/{logbookId}/validasi', [LogbookController::class, 'storeValidasi']);
+Route::get('logbook/{logbookId}/validasi', [LogbookController::class, 'indexValidasi']);
+Route::post('logbook', [LogbookController::class, 'storeLogbook']);
+Route::get('logbook/{studentId}', [LogbookController::class, 'indexLogbook']);
+Route::get('logbook/detail/{logbookId}', [LogbookController::class, 'showLogbook']);
+Route::put('logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
+Route::delete('logbook/{logbookId}', [LogbookController::class, 'destroyLogbook']);
+Route::get('logbook/all', [LogbookController::class, 'indexAllLogbooks']);
 
 Route::post('/pendaftaran-kp', [PendaftaranKPController::class, 'daftar']);
 Route::post('/pendaftaran-kp/{id}/upload', [PendaftaranKPController::class, 'uploadBerkas']);
@@ -51,6 +84,7 @@ Route::apiResource('seminars', SeminarController::class);
 Route::post('seminars/{seminar}/assign-examiners', [SeminarController::class, 'assignExaminers']);
 Route::post('seminars/{seminar}/notify', [SeminarController::class, 'notify']);
 
+
 Route::prefix('pengajuan-tempat-kp')->group(function () {
   Route::post('/', [PengajuanTempatKPController::class, 'store']);
     Route::get('/', [PengajuanTempatKPController::class, 'index']);
@@ -61,3 +95,19 @@ Route::prefix('pengajuan-tempat-kp')->group(function () {
     Route::post('/{id}/reset', [PengajuanTempatKPController::class, 'reset']);  
    
 });
+
+Route::get('validasi-logbook', [ValidasiController::class, 'indexValidasi']);       
+Route::post('validasi-logbook', [ValidasiController::class, 'storeValidasi']);      
+Route::get('validasi-logbook/{id}', [ValidasiController::class, 'showValidasi']);   
+Route::put('validasi-logbook/{id}', [ValidasiController::class, 'updateValidasi']); 
+Route::delete('validasi-logbook/{id}', [ValidasiController::class, 'destroyValidasi']); 
+
+Route::get('evaluasi-kp', [EvaluasiKPController::class, 'index']);            // List semua evaluasi
+Route::post('evaluasi-kp', [EvaluasiKPController::class, 'store']);           // Tambah evaluasi
+Route::get('evaluasi-kp/{id}', [EvaluasiKPController::class, 'show']);        // Detail evaluasi
+Route::put('evaluasi-kp/{id}', [EvaluasiKPController::class, 'update']);      // Update evaluasi
+Route::delete('evaluasi-kp/{id}', [EvaluasiKPController::class, 'destroy']);  // Hapus evaluasi
+
+// Evaluasi berdasarkan logbook tertentu
+Route::get('evaluasi-kp/logbook/{logbookId}', [EvaluasiKPController::class, 'byLogbook']);
+
