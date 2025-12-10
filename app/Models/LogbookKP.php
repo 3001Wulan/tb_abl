@@ -21,4 +21,9 @@ class LogbookKP extends Model
     {
         return $this->hasOne(ValidasiLogbook::class, 'logbook_kp_id');
     }
+    public function student()
+{
+    return $this->belongsTo(Student::class, 'student_id');
+}
+
 }

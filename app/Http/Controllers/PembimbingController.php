@@ -8,6 +8,16 @@ use App\Models\SuratTugas;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @OA\Tag(
+ * name="Pembimbingan",
+ * description="Operasi terkait penentuan, pembaruan dosen pembimbing, dan notifikasi."
+ * )
+ * @OA\Tag(
+ * name="Surat Tugas",
+ * description="Operasi terkait pembuatan, pengunduhan, dan penghapusan dokumen Surat Tugas."
+ * )
+ */
 class PembimbingController extends Controller
 {
     /*
@@ -15,6 +25,35 @@ class PembimbingController extends Controller
     | 1. Menentukan Dosen Pembimbing
     |--------------------------------------------------------------------------
     */
+    /**
+     * @OA\Post(
+     * path="/pembimbing",
+     * operationId="tentukanPembimbing",
+     * tags={"Pembimbingan"},
+     * summary="Menentukan dosen pembimbing baru.",
+     * description="Mencatat penunjukan dosen pembimbing beserta judul tugas untuk mahasiswa.",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"student_id", "lecturer_id", "judul"},
+     * @OA\Property(property="student_id", type="integer", example=1, description="ID Mahasiswa yang akan dibimbing."),
+     * @OA\Property(property="lecturer_id", type="integer", example=12, description="ID Dosen pembimbing."),
+     * @OA\Property(property="judul", type="string", example="Rancangan Sistem Informasi Akademik", description="Judul tugas yang akan dibimbing.")
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Dosen pembimbing berhasil ditentukan",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Dosen pembimbing berhasil ditentukan"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Validasi gagal"
+     * )
+     * )
+     */
     public function tentukanPembimbing(Request $request)
     {
         $request->validate([
@@ -40,6 +79,30 @@ class PembimbingController extends Controller
     | 2. Membuat Surat Tugas Pembimbing
     |--------------------------------------------------------------------------
     */
+    /**
+     * @OA\Post(
+     * path="/surat-tugas",
+     * operationId="buatSuratTugas",
+     * tags={"Surat Tugas"},
+     * summary="Membuat dan menyimpan surat tugas pembimbing.",
+     * description="Membuat file surat tugas (simulasi .txt) dan mencatatnya ke database.",
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"supervision_id"},
+     * @OA\Property(property="supervision_id", type="integer", example=1, description="ID data Supervision yang akan dibuatkan surat tugas.")
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Surat tugas pembimbing berhasil dibuat",
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Data pembimbing tidak ditemukan"
+     * )
+     * )
+     */
     public function buatSuratTugas(Request $request)
     {
         $request->validate([
@@ -66,11 +129,11 @@ class PembimbingController extends Controller
 
         $tanggal = date('d-m-Y');
         $content = "Nomor Surat: {$nomorSurat}\n" .
-                   "Tanggal: {$tanggal}\n" .
-                   "Kepada: {$supervision->lecturer->name}\n" .
-                   "Mahasiswa: {$supervision->student->name}\n" .
-                   "Judul Tugas: {$supervision->judul}\n\n" .
-                   "Dengan ini ditugaskan sebagai dosen pembimbing mahasiswa di atas.";
+                    "Tanggal: {$tanggal}\n" .
+                    "Kepada: {$supervision->lecturer->name}\n" .
+                    "Mahasiswa: {$supervision->student->name}\n" .
+                    "Judul Tugas: {$supervision->judul}\n\n" .
+                    "Dengan ini ditugaskan sebagai dosen pembimbing mahasiswa di atas.";
 
         Storage::disk('local')->put($filePath, $content);
 
@@ -91,6 +154,33 @@ class PembimbingController extends Controller
     | 3. Download Surat Tugas Pembimbing
     |--------------------------------------------------------------------------
     */
+    /**
+     * @OA\Get(
+     * path="/surat-tugas/{id}",
+     * operationId="downloadSuratTugas",
+     * tags={"Surat Tugas"},
+     * summary="Mengunduh file surat tugas.",
+     * description="Mengunduh file surat tugas yang tersimpan di storage lokal berdasarkan ID Surat Tugas.",
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID SuratTugas yang akan diunduh.",
+     * @OA\Schema(type="integer", format="int64", example=1)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Berhasil mengunduh file.",
+     * @OA\MediaType(
+     * mediaType="application/octet-stream"
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="File surat tugas tidak ditemukan"
+     * )
+     * )
+     */
     public function downloadSuratTugas($id)
     {
         $surat = SuratTugas::find($id);
@@ -109,6 +199,30 @@ class PembimbingController extends Controller
     | 4. Menghapus Surat Tugas Pembimbing
     |--------------------------------------------------------------------------
     */
+    /**
+     * @OA\Delete(
+     * path="/surat-tugas/{id}",
+     * operationId="deleteSuratTugas",
+     * tags={"Surat Tugas"},
+     * summary="Menghapus surat tugas dan file terkait.",
+     * description="Menghapus record SuratTugas dari database dan file dari storage.",
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID SuratTugas yang akan dihapus.",
+     * @OA\Schema(type="integer", format="int64", example=1)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Surat tugas pembimbing berhasil dihapus",
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Surat tugas pembimbing tidak ditemukan"
+     * )
+     * )
+     */
     public function deleteSuratTugas($id)
     {
         $surat = SuratTugas::find($id);
@@ -135,6 +249,30 @@ class PembimbingController extends Controller
     | 5. Notifikasi ke Mahasiswa dan Dosen
     |--------------------------------------------------------------------------
     */
+    /**
+     * @OA\Post(
+     * path="/notifikasi/{supervisionId}",
+     * operationId="kirimNotifikasi",
+     * tags={"Pembimbingan"},
+     * summary="Mengirim notifikasi penunjukan pembimbing.",
+     * description="Mensimulasikan pengiriman notifikasi/email ke mahasiswa dan dosen terkait penunjukan.",
+     * @OA\Parameter(
+     * name="supervisionId",
+     * in="path",
+     * required=true,
+     * description="ID data Supervision yang akan dikirimkan notifikasi.",
+     * @OA\Schema(type="integer", format="int64", example=1)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Notifikasi berhasil dikirim ke mahasiswa dan dosen",
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Data pembimbing tidak ditemukan"
+     * )
+     * )
+     */
     public function kirimNotifikasi($supervisionId)
     {
         $supervision = Supervision::with(['student', 'lecturer'])->find($supervisionId);
@@ -162,6 +300,38 @@ class PembimbingController extends Controller
     | 6. Update Dosen Pembimbing (dan buat ulang surat tugas jika diganti)
     |--------------------------------------------------------------------------
     */
+    /**
+     * @OA\Put(
+     * path="/pembimbing/{id}",
+     * operationId="updatePembimbing",
+     * tags={"Pembimbingan"},
+     * summary="Memperbarui dosen pembimbing dan/atau judul tugas.",
+     * description="Memperbarui data pembimbing (Supervision), menghapus surat tugas lama, dan membuat yang baru secara otomatis.",
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID data Supervision yang akan diperbarui.",
+     * @OA\Schema(type="integer", format="int64", example=1)
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"lecturer_id"},
+     * @OA\Property(property="lecturer_id", type="integer", example=15, description="ID Dosen pembimbing yang baru."),
+     * @OA\Property(property="judul", type="string", example="Perancangan Ulang Sistem Informasi", description="Judul tugas yang diperbarui (optional).")
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Dosen pembimbing berhasil diperbarui dan surat tugas baru dibuat",
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Data pembimbing tidak ditemukan"
+     * )
+     * )
+     */
     public function updatePembimbing(Request $request, $id)
     {
         $request->validate([
@@ -203,11 +373,11 @@ class PembimbingController extends Controller
 
         $tanggal = date('d-m-Y');
         $content = "Nomor Surat: {$nomorSurat}\n" .
-                   "Tanggal: {$tanggal}\n" .
-                   "Kepada: {$supervision->lecturer->name}\n" .
-                   "Mahasiswa: {$supervision->student->name}\n" .
-                   "Judul Tugas: {$supervision->judul}\n\n" .
-                   "Dengan ini ditugaskan sebagai dosen pembimbing mahasiswa di atas.";
+                    "Tanggal: {$tanggal}\n" .
+                    "Kepada: {$supervision->lecturer->name}\n" .
+                    "Mahasiswa: {$supervision->student->name}\n" .
+                    "Judul Tugas: {$supervision->judul}\n\n" .
+                    "Dengan ini ditugaskan sebagai dosen pembimbing mahasiswa di atas.";
 
         Storage::disk('local')->put($filePath, $content);
 
