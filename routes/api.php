@@ -12,7 +12,7 @@ use App\Http\Controllers\ProsedurKPController;
 use App\Http\Controllers\VerifikasiAdministrasiController;
 use App\Http\Controllers\SuratPengantarKPController;
 use App\Http\Controllers\SeminarController;
-
+use App\Http\Controllers\PengajuanTempatKPController;
 
 
 Route::post('/tentukan-pembimbing', [PembimbingController::class, 'tentukanPembimbing']);
@@ -51,3 +51,13 @@ Route::apiResource('seminars', SeminarController::class);
 Route::post('seminars/{seminar}/assign-examiners', [SeminarController::class, 'assignExaminers']);
 Route::post('seminars/{seminar}/notify', [SeminarController::class, 'notify']);
 
+Route::prefix('pengajuan-tempat-kp')->group(function () {
+  Route::post('/', [PengajuanTempatKPController::class, 'store']);
+    Route::get('/', [PengajuanTempatKPController::class, 'index']);
+    Route::get('/{id}', [PengajuanTempatKPController::class, 'show']);
+    Route::post('/{id}/persetujuan-instansi', [PengajuanTempatKPController::class, 'persetujuanInstansi']);
+    Route::post('/{id}/persetujuan-jurusan', [PengajuanTempatKPController::class, 'persetujuanJurusan']);
+    Route::get('/{id}/status', [PengajuanTempatKPController::class, 'getStatus']);
+    Route::post('/{id}/reset', [PengajuanTempatKPController::class, 'reset']);  
+   
+});
