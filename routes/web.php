@@ -6,8 +6,7 @@ Route::get('/api/documentation', function () {
     return view('l5-swagger::index');
 });
 
-<<<<<<< HEAD
-=======
+
 // Swagger UI
 Route::get('/api/documentation', function () {
     return view('vendor.l5-swagger.index', [
@@ -26,4 +25,4 @@ Route::get('/api-docs.json', function () {
 
     return response()->file($path);
 });
->>>>>>> dfdd6c5b57be1269e32f509b6b86424bda10e388
+
