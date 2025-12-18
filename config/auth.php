@@ -6,6 +6,13 @@ return [
         'guard' => 'web',
         'passwords' => 'users',
     ],
+    
+    'api' => [
+        'driver' => 'sanctum',
+        'provider' => 'users',
+        'hash' => false,
+    ],
+    
 
     'guards' => [
         'web' => [

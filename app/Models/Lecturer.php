@@ -16,8 +16,6 @@ class Lecturer extends Model
         'kuota_bimbingan',
         'email',
     ];
-
-    // Relasi ke supervisi (bimbingan)
     public function supervisions()
     {
         return $this->hasMany(Supervision::class);

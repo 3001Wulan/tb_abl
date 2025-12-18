@@ -10,17 +10,22 @@ return new class extends Migration
     {
         Schema::create('logbook_k_p_s', function (Blueprint $table) {
             $table->id();
+
             // Kunci Asing ke tabel students
             $table->foreignId('student_id')->constrained('students'); 
             
-            $table->unsignedSmallInteger('minggu_ke'); // Minggu ke berapa logbook ini
+            $table->unsignedSmallInteger('minggu_ke'); 
             $table->date('tanggal_mulai');
             $table->text('deskripsi_kegiatan');
-            $table->enum('status', ['Pending', 'Disetujui', 'Ditolak'])->default('Pending');
+
+            // Tambahan untuk upload file
+            $table->string('file_kegiatan')->nullable(); 
             
+            $table->enum('status', ['Pending', 'Disetujui', 'Ditolak'])->default('Pending');
             $table->timestamps();
 
-            $table->unique(['student_id', 'minggu_ke']); // Setiap siswa hanya boleh satu logbook per minggu
+            // Satu minggu hanya satu logbook per siswa
+            $table->unique(['student_id', 'minggu_ke']);
         });
     }
 

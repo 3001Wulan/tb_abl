@@ -12,18 +12,18 @@ class LogbookKP extends Model
         'student_id', 
         'minggu_ke', 
         'tanggal_mulai', 
-        'deskripsi_kegiatan', 
-        'status' // Disetujui, Ditolak, Pending
+        'deskripsi_kegiatan',
+        'file_kegiatan',   
+        'status'
     ];
 
-    // Relasi: Satu Logbook memiliki satu Validasi
     public function validasi()
     {
         return $this->hasOne(ValidasiLogbook::class, 'logbook_kp_id');
     }
-    public function student()
-{
-    return $this->belongsTo(Student::class, 'student_id');
-}
 
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'student_id');
+    }
 }

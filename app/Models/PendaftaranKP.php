@@ -1,5 +1,4 @@
 <?php
-// File: app/Models/PendaftaranKP.php
 
 namespace App\Models;
 
