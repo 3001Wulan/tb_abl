@@ -16,6 +16,8 @@ use App\Http\Controllers\ProsedurKPController;
 use App\Http\Controllers\VerifikasiAdministrasiController;
 use App\Http\Controllers\SuratPengantarKPController;
 use App\Http\Controllers\SeminarController;
+use App\Http\Controllers\PenilaianKPController;
+use App\Http\Controllers\PengumpulanLaporanKPController;
 
 
 
@@ -111,4 +113,15 @@ Route::get('/surat-pengantar/{id}/status', [SuratPengantarKPController::class, '
 Route::apiResource('seminars', SeminarController::class);
 Route::post('seminars/{seminar}/assign-examiners', [SeminarController::class, 'assignExaminers']);
 Route::post('seminars/{seminar}/notify', [SeminarController::class, 'notify']);
+Route::get('/penilaian', [PenilaianKPController::class, 'index']);
+Route::post('/penilaian', [PenilaianKPController::class, 'store']);
+Route::get('/penilaian/{id}', [PenilaianKPController::class, 'show']);
+Route::put('/penilaian/{id}', [PenilaianKPController::class, 'update']);
+Route::delete('/penilaian/{id}', [PenilaianKPController::class, 'destroy']);
+Route::post('/laporan/upload', [PengumpulanLaporanKPController::class, 'upload']);
+Route::get('/laporan', [PengumpulanLaporanKPController::class, 'index']);
+Route::get('/laporan/{id}', [PengumpulanLaporanKPController::class, 'show']);
+Route::delete('/laporan/{id}', [PengumpulanLaporanKPController::class, 'destroy']);
+Route::post('/laporan/update/{id}', [PengumpulanLaporanKPController::class, 'update']);
+
 
