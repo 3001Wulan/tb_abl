@@ -1,10 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\PembimbingController;
 use App\Http\Controllers\KonsultasiController;
 use App\Http\Controllers\LogbookController;
 use App\Http\Controllers\ValidasiController;
+use App\Http\Controllers\AuthController;
+use Illuminate\Http\Request;
+
 
 
 use App\Http\Controllers\PendaftaranKPController;
@@ -31,25 +35,19 @@ Route::put('/update-pembimbing/{id}', [PembimbingController::class, 'updatePembi
 Route::get('jadwal-bimbingan', [KonsultasiController::class,'indexJadwal']);
 Route::post('jadwal-bimbingan', [KonsultasiController::class,'storeJadwal']);
 
-// Forum Konsultasi
 Route::get('forum', [KonsultasiController::class,'indexForum']);
 Route::post('forum', [KonsultasiController::class,'storeForum']);
 Route::post('forum/{id}/komentar', [KonsultasiController::class,'storeKomentar']);
 
-// Catatan Bimbingan
 Route::get('catatan-bimbingan/{studentId}', [KonsultasiController::class,'indexCatatan']);
 Route::post('catatan-bimbingan', [KonsultasiController::class,'storeCatatan']);
 
 Route::post('logbook', [LogbookController::class, 'storeLogbook']);
 Route::get('logbook/{studentId}', [LogbookController::class, 'indexLogbook']);
-Route::post('logbook/{logbookId}/validasi', [LogbookController::class, 'storeValidasi']);
-Route::get('logbook/{logbookId}/validasi', [LogbookController::class, 'indexValidasi']);
-Route::post('logbook', [LogbookController::class, 'storeLogbook']);
-Route::get('logbook/{studentId}', [LogbookController::class, 'indexLogbook']);
 Route::get('logbook/detail/{logbookId}', [LogbookController::class, 'showLogbook']);
 Route::put('logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
 Route::delete('logbook/{logbookId}', [LogbookController::class, 'destroyLogbook']);
-Route::get('logbook/all', [LogbookController::class, 'indexAllLogbooks']);
+Route::post('/logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
 
 Route::post('/pendaftaran-kp', [PendaftaranKPController::class, 'daftar']);
 Route::post('/pendaftaran-kp/{id}/upload', [PendaftaranKPController::class, 'uploadBerkas']);
@@ -89,11 +87,20 @@ Route::get('validasi-logbook/{id}', [ValidasiController::class, 'showValidasi'])
 Route::put('validasi-logbook/{id}', [ValidasiController::class, 'updateValidasi']); 
 Route::delete('validasi-logbook/{id}', [ValidasiController::class, 'destroyValidasi']); 
 
-Route::get('evaluasi-kp', [EvaluasiKPController::class, 'index']);            // List semua evaluasi
-Route::post('evaluasi-kp', [EvaluasiKPController::class, 'store']);           // Tambah evaluasi
-Route::get('evaluasi-kp/{id}', [EvaluasiKPController::class, 'show']);        // Detail evaluasi
-Route::put('evaluasi-kp/{id}', [EvaluasiKPController::class, 'update']);      // Update evaluasi
-Route::delete('evaluasi-kp/{id}', [EvaluasiKPController::class, 'destroy']);  // Hapus evaluasi
+Route::get('evaluasi-kp', [EvaluasiKPController::class, 'index']);            
+Route::post('evaluasi-kp', [EvaluasiKPController::class, 'store']);           
+Route::get('evaluasi-kp/{id}', [EvaluasiKPController::class, 'show']);        
+Route::put('evaluasi-kp/{id}', [EvaluasiKPController::class, 'update']);      
+Route::delete('evaluasi-kp/{id}', [EvaluasiKPController::class, 'destroy']);  
 
-// Evaluasi berdasarkan logbook tertentu
 Route::get('evaluasi-kp/logbook/{logbookId}', [EvaluasiKPController::class, 'byLogbook']);
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::middleware('auth:sanctum')->get('logbook', function (Request $request) {
+    return Logbook::where('student_id', $request->user()->id)->get();
+});
+Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
+    return $request->user();
+});

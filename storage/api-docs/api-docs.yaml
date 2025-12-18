@@ -6,6 +6,193 @@ info:
     email: admin@unand.ac.id
   version: 1.0.0
 paths:
+  /logbook:
+    post:
+      tags:
+        - 'Logbook (Siswa)'
+      summary: 'Siswa mengunggah Logbook kegiatan mingguan (termasuk file).'
+      description: 'Mengunggah Logbook baru. Mendukung pengiriman file kegiatan opsional.'
+      operationId: storeLogbook
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - student_id
+                - minggu_ke
+                - tanggal_mulai
+                - deskripsi_kegiatan
+              properties:
+                student_id:
+                  description: 'ID Siswa'
+                  type: integer
+                  example: 5
+                minggu_ke:
+                  description: 'Minggu ke- KP (unik per siswa)'
+                  type: integer
+                  example: 3
+                tanggal_mulai:
+                  description: 'Tanggal mulai minggu kegiatan (YYYY-MM-DD)'
+                  type: string
+                  format: date
+                  example: '2025-01-20'
+                deskripsi_kegiatan:
+                  type: string
+                  example: 'Melakukan instalasi dan konfigurasi server.'
+                file_kegiatan:
+                  description: 'File pendukung (maks 2MB, pdf, doc, docx, jpg, jpeg, png).'
+                  type: string
+                  format: binary
+                  nullable: true
+              type: object
+      responses:
+        201:
+          description: 'Logbook berhasil dibuat.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogbookKP'
+        422:
+          description: 'Kesalahan Validasi.'
+  '/logbook/{studentId}':
+    get:
+      tags:
+        - 'Logbook (Siswa)'
+      summary: 'Mengambil semua Logbook (beserta validasinya) untuk seorang siswa.'
+      description: 'Menampilkan daftar semua Logbook siswa untuk pelacakan kemajuan KP.'
+      operationId: indexLogbook
+      parameters:
+        -
+          name: studentId
+          in: path
+          description: 'ID Siswa'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 5
+      responses:
+        200:
+          description: 'Daftar Logbook siswa.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogbookKPWithValidation'
+  '/logbook/detail/{logbookId}':
+    get:
+      tags:
+        - 'Logbook (Siswa)'
+      summary: 'Menampilkan detail satu Logbook.'
+      description: 'Mendapatkan detail Logbook beserta data validasinya.'
+      operationId: showLogbook
+      parameters:
+        -
+          name: logbookId
+          in: path
+          description: 'ID Logbook'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 10
+      responses:
+        200:
+          description: 'Detail Logbook.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogbookKPWithValidation'
+        404:
+          description: 'Logbook tidak ditemukan.'
+  '/logbook/{logbookId}':
+    put:
+      tags:
+        - 'Logbook (Siswa)'
+      summary: 'Siswa mengupdate Logbook yang belum divalidasi'
+      description: "Memperbarui data Logbook KP. Pembaruan hanya dapat dilakukan jika status Logbook masih 'Pending'. File kegiatan dapat diganti (opsional)."
+      operationId: updateLogbook
+      parameters:
+        -
+          name: logbookId
+          in: path
+          description: 'ID Logbook'
+          required: true
+          schema:
+            type: integer
+            example: 10
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - minggu_ke
+                - tanggal_mulai
+                - deskripsi_kegiatan
+              properties:
+                minggu_ke:
+                  description: 'Minggu ke kegiatan KP'
+                  type: integer
+                  example: 4
+                tanggal_mulai:
+                  type: string
+                  format: date
+                  example: '2025-01-27'
+                deskripsi_kegiatan:
+                  type: string
+                  example: 'Melakukan coding modul A.'
+                file_kegiatan:
+                  description: 'File laporan/kegiatan (pdf, doc, docx, jpg, png) — opsional'
+                  type: string
+                  format: binary
+              type: object
+      responses:
+        200:
+          description: 'Logbook berhasil diperbarui'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogbookKP'
+        403:
+          description: 'Logbook sudah divalidasi dan tidak dapat diubah'
+        404:
+          description: 'Logbook tidak ditemukan'
+        422:
+          description: 'Kesalahan validasi'
+    delete:
+      tags:
+        - 'Logbook (Siswa)'
+      summary: 'Siswa menghapus Logbook yang belum divalidasi.'
+      description: "Menghapus data Logbook. Penghapusan diblokir jika status Logbook bukan 'Pending'."
+      operationId: destroyLogbook
+      parameters:
+        -
+          name: logbookId
+          in: path
+          description: 'ID Logbook'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 10
+      responses:
+        200:
+          description: 'Logbook berhasil dihapus.'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Logbook berhasil dihapus.'
+                type: object
+        403:
+          description: 'Logbook sudah divalidasi dan tidak dapat dihapus.'
+        404:
+          description: 'Logbook tidak ditemukan.'
   /pembimbing:
     post:
       tags:
@@ -288,7 +475,79 @@ paths:
           description: Deleted
         404:
           description: 'Not Found'
+components:
+  schemas:
+    LogbookKP:
+      title: LogbookKP
+      description: 'Model data Logbook Kerja Praktik.'
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          example: 1
+        student_id:
+          type: integer
+          example: 5
+        minggu_ke:
+          description: 'Minggu ke- KP (unik per siswa).'
+          type: integer
+          example: 3
+        tanggal_mulai:
+          type: string
+          format: date
+          example: '2025-01-20'
+        deskripsi_kegiatan:
+          type: string
+          example: 'Melakukan instalasi dan konfigurasi server.'
+        file_kegiatan:
+          description: 'Path file kegiatan.'
+          type: string
+          example: logbook_files/abc.pdf
+          nullable: true
+        status:
+          type: string
+          default: Pending
+          enum:
+            - Pending
+            - Validated
+            - Rejected
+          readOnly: true
+      type: object
+    ValidasiLogbook:
+      title: ValidasiLogbook
+      description: 'Model data Validasi Logbook oleh Dosen/Validator.'
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          example: 1
+        status:
+          type: string
+          enum:
+            - Validated
+            - Rejected
+          example: Validated
+        catatan_validator:
+          type: string
+          example: 'Laporan mingguan sudah baik.'
+          nullable: true
+      type: object
+    LogbookKPWithValidation:
+      allOf:
+        -
+          $ref: '#/components/schemas/LogbookKP'
+        -
+          properties:
+            validasi:
+              oneOf:
+                -
+                  $ref: '#/components/schemas/ValidasiLogbook'
+              nullable: true
+          type: object
 tags:
+  -
+    name: 'Logbook (Siswa)'
+    description: 'Operasi CRUD dan Tracking Logbook kegiatan KP oleh Mahasiswa.'
   -
     name: Pembimbingan
     description: 'Operasi terkait penentuan, pembaruan dosen pembimbing, dan notifikasi.'

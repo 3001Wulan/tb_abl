@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 
 class Student extends Model
+
 {
+    public $incrementing = false; 
     use HasFactory;
 
     protected $fillable = ['nim', 'nama', 'email'];
 
-    // Jika tabel bukan 'students', tambahkan property $table
-    // protected $table = 'mahasiswa';
+public function student()
+{
+    return $this->hasOne(Student::class, 'id', 'id');
+}
 }
