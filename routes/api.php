@@ -20,6 +20,9 @@ use App\Http\Controllers\ProsedurKPController;
 use App\Http\Controllers\VerifikasiAdministrasiController;
 use App\Http\Controllers\SuratPengantarKPController;
 use App\Http\Controllers\SeminarController;
+use App\Http\Controllers\PenilaianKPController;
+use App\Http\Controllers\PengumpulanLaporanKPController;
+use App\Http\Controllers\PengajuanTempatKPController;
 use App\Http\Controllers\EvaluasiKPController;
 
 
@@ -80,6 +83,29 @@ Route::get('/surat-pengantar/{id}/status', [SuratPengantarKPController::class, '
 Route::apiResource('seminars', SeminarController::class);
 Route::post('seminars/{seminar}/assign-examiners', [SeminarController::class, 'assignExaminers']);
 Route::post('seminars/{seminar}/notify', [SeminarController::class, 'notify']);
+Route::get('/penilaian', [PenilaianKPController::class, 'index']);
+Route::post('/penilaian', [PenilaianKPController::class, 'store']);
+Route::get('/penilaian/{id}', [PenilaianKPController::class, 'show']);
+Route::put('/penilaian/{id}', [PenilaianKPController::class, 'update']);
+Route::delete('/penilaian/{id}', [PenilaianKPController::class, 'destroy']);
+Route::post('/laporan/upload', [PengumpulanLaporanKPController::class, 'upload']);
+Route::get('/laporan', [PengumpulanLaporanKPController::class, 'index']);
+Route::get('/laporan/{id}', [PengumpulanLaporanKPController::class, 'show']);
+Route::delete('/laporan/{id}', [PengumpulanLaporanKPController::class, 'destroy']);
+Route::post('/laporan/update/{id}', [PengumpulanLaporanKPController::class, 'update']);
+
+
+
+Route::prefix('pengajuan-tempat-kp')->group(function () {
+  Route::post('/', [PengajuanTempatKPController::class, 'store']);
+    Route::get('/', [PengajuanTempatKPController::class, 'index']);
+    Route::get('/{id}', [PengajuanTempatKPController::class, 'show']);
+    Route::post('/{id}/persetujuan-instansi', [PengajuanTempatKPController::class, 'persetujuanInstansi']);
+    Route::post('/{id}/persetujuan-jurusan', [PengajuanTempatKPController::class, 'persetujuanJurusan']);
+    Route::get('/{id}/status', [PengajuanTempatKPController::class, 'getStatus']);
+    Route::post('/{id}/reset', [PengajuanTempatKPController::class, 'reset']);  
+   
+});
 
 Route::get('validasi-logbook', [ValidasiController::class, 'indexValidasi']);       
 Route::post('validasi-logbook', [ValidasiController::class, 'storeValidasi']);      

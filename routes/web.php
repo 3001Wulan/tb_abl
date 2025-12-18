@@ -30,6 +30,12 @@ Route::get('/mahasiswa/logbook/{id}/edit', [LogbookController::class, 'edit'])
     ->name('logbook.edit');
 
 Route::get('/api/documentation', function () {
+    return view('l5-swagger::index');
+});
+
+
+// Swagger UI
+Route::get('/api/documentation', function () {
     return view('vendor.l5-swagger.index', [
         'documentation' => 'default',
         'documentationTitle' => 'API Documentation'
