@@ -1,0 +1,179 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Layanan KP",
+        "description": "Dokumentasi API Validasi Logbook Mahasiswa",
+        "contact": {
+            "email": "admin@unand.ac.id"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/validasi": {
+            "get": {
+                "tags": [
+                    "Validasi Logbook"
+                ],
+                "summary": "Menampilkan semua data validasi",
+                "operationId": "4c8515eb77a36011690dee4d58169c52",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Validasi Logbook"
+                ],
+                "summary": "Membuat validasi baru",
+                "operationId": "b1b9ef6dedce63b7e19c1512509793ec",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "logbook_kp_id",
+                                    "lecturer_id",
+                                    "status_validasi"
+                                ],
+                                "properties": {
+                                    "logbook_kp_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "lecturer_id": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "status_validasi": {
+                                        "type": "string",
+                                        "example": "Disetujui"
+                                    },
+                                    "catatan_pembimbing": {
+                                        "type": "string",
+                                        "example": "Bagus, lanjutkan."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Validasi berhasil dibuat"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            }
+        },
+        "/api/validasi/{id}": {
+            "get": {
+                "tags": [
+                    "Validasi Logbook"
+                ],
+                "summary": "Menampilkan detail validasi berdasarkan ID",
+                "operationId": "d7ad00f942cb049445b101ac08004a3d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID validasi",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Validasi Logbook"
+                ],
+                "summary": "Memperbarui validasi logbook",
+                "operationId": "cff55a6de9c76da6dfe493e5e3ca8580",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID validasi yang akan diperbarui",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status_validasi": {
+                                        "type": "string",
+                                        "example": "Revisi"
+                                    },
+                                    "catatan_pembimbing": {
+                                        "type": "string",
+                                        "example": "Tolong revisi bagian hasil."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Validasi Logbook"
+                ],
+                "summary": "Menghapus validasi logbook",
+                "operationId": "d375560dfda909b7a5c3db088fd681d1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Validasi Logbook",
+            "description": "API untuk melakukan validasi logbook mahasiswa"
+        }
+    ]
+}

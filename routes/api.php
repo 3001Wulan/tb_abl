@@ -18,6 +18,9 @@ use App\Http\Controllers\SuratPengantarKPController;
 use App\Http\Controllers\SeminarController;
 use App\Http\Controllers\PenilaianKPController;
 use App\Http\Controllers\PengumpulanLaporanKPController;
+use App\Http\Controllers\PengajuanTempatKPController;
+use App\Http\Controllers\EvaluasiKPController;
+
 
 
 
@@ -41,45 +44,14 @@ Route::get('catatan-bimbingan/{studentId}', [KonsultasiController::class,'indexC
 Route::post('catatan-bimbingan', [KonsultasiController::class,'storeCatatan']);
 
 Route::post('logbook', [LogbookController::class, 'storeLogbook']);
-// GET: Mengambil semua Logbook siswa (untuk Tracking Progres KP)
 Route::get('logbook/{studentId}', [LogbookController::class, 'indexLogbook']);
-
-// 2. Endpoint untuk Dosen Pembimbing (Validasi)
-// POST: Dosen memvalidasi Logbook tertentu (Disetujui/Ditolak)
 Route::post('logbook/{logbookId}/validasi', [LogbookController::class, 'storeValidasi']);
-// GET: Melihat status validasi untuk Logbook tertentu
 Route::get('logbook/{logbookId}/validasi', [LogbookController::class, 'indexValidasi']);
-
-Route::post('logbook/{logbookId}/validasi', [ValidasiController::class, 'storeValidasi']);
-// GET: Melihat detail validasi Logbook
-Route::get('logbook/{logbookId}/validasi', [ValidasiController::class, 'indexValidasi']);
-
-// POST: Dosen menyimpan/memperbarui Evaluasi Tengah
-Route::post('evaluasi-tengah/{studentId}', [ValidasiController::class, 'storeEvaluasiTengah']);
-// GET: Mengambil hasil Evaluasi Tengah
-Route::get('evaluasi-tengah/{studentId}', [ValidasiController::class, 'indexEvaluasiTengah']);
-
-
 Route::post('logbook', [LogbookController::class, 'storeLogbook']);
-
-// 2. TRACKING PROGRES (GET)
-// Digunakan oleh Siswa untuk melihat semua logbooknya.
 Route::get('logbook/{studentId}', [LogbookController::class, 'indexLogbook']);
-
-// 3. DETAIL LOGBOOK (GET)
-// Digunakan oleh Siswa/Dosen untuk melihat detail satu logbook spesifik.
 Route::get('logbook/detail/{logbookId}', [LogbookController::class, 'showLogbook']);
-
-// 4. UPDATE LOGBOOK (PUT)
-// Digunakan oleh Siswa untuk mengupdate logbook yang masih 'Pending'.
 Route::put('logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
-
-// 5. HAPUS LOGBOOK (DELETE)
-// Digunakan oleh Siswa untuk menghapus logbook yang masih 'Pending'.
 Route::delete('logbook/{logbookId}', [LogbookController::class, 'destroyLogbook']);
-
-// 6. GLOBAL MONITORING (GET)
-// Digunakan oleh Dosen untuk melihat semua logbook dari seluruh mahasiswa.
 Route::get('logbook/all', [LogbookController::class, 'indexAllLogbooks']);
 
 Route::post('/pendaftaran-kp', [PendaftaranKPController::class, 'daftar']);
@@ -124,4 +96,31 @@ Route::get('/laporan/{id}', [PengumpulanLaporanKPController::class, 'show']);
 Route::delete('/laporan/{id}', [PengumpulanLaporanKPController::class, 'destroy']);
 Route::post('/laporan/update/{id}', [PengumpulanLaporanKPController::class, 'update']);
 
+
+
+Route::prefix('pengajuan-tempat-kp')->group(function () {
+  Route::post('/', [PengajuanTempatKPController::class, 'store']);
+    Route::get('/', [PengajuanTempatKPController::class, 'index']);
+    Route::get('/{id}', [PengajuanTempatKPController::class, 'show']);
+    Route::post('/{id}/persetujuan-instansi', [PengajuanTempatKPController::class, 'persetujuanInstansi']);
+    Route::post('/{id}/persetujuan-jurusan', [PengajuanTempatKPController::class, 'persetujuanJurusan']);
+    Route::get('/{id}/status', [PengajuanTempatKPController::class, 'getStatus']);
+    Route::post('/{id}/reset', [PengajuanTempatKPController::class, 'reset']);  
+   
+});
+
+Route::get('validasi-logbook', [ValidasiController::class, 'indexValidasi']);       
+Route::post('validasi-logbook', [ValidasiController::class, 'storeValidasi']);      
+Route::get('validasi-logbook/{id}', [ValidasiController::class, 'showValidasi']);   
+Route::put('validasi-logbook/{id}', [ValidasiController::class, 'updateValidasi']); 
+Route::delete('validasi-logbook/{id}', [ValidasiController::class, 'destroyValidasi']); 
+
+Route::get('evaluasi-kp', [EvaluasiKPController::class, 'index']);            // List semua evaluasi
+Route::post('evaluasi-kp', [EvaluasiKPController::class, 'store']);           // Tambah evaluasi
+Route::get('evaluasi-kp/{id}', [EvaluasiKPController::class, 'show']);        // Detail evaluasi
+Route::put('evaluasi-kp/{id}', [EvaluasiKPController::class, 'update']);      // Update evaluasi
+Route::delete('evaluasi-kp/{id}', [EvaluasiKPController::class, 'destroy']);  // Hapus evaluasi
+
+// Evaluasi berdasarkan logbook tertentu
+Route::get('evaluasi-kp/logbook/{logbookId}', [EvaluasiKPController::class, 'byLogbook']);
 
