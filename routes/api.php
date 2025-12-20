@@ -19,9 +19,9 @@ use App\Http\Controllers\TemplateDokumenController;
 use App\Http\Controllers\ProsedurKPController;
 use App\Http\Controllers\VerifikasiAdministrasiController;
 use App\Http\Controllers\SuratPengantarKPController;
-use App\Http\Controllers\SeminarController;
+use App\Http\Controllers\JadwalSeminarKpController;
 use App\Http\Controllers\PenilaianKPController;
-use App\Http\Controllers\PengumpulanLaporanKPController;
+use App\Http\Controllers\LaporanKPController;
 use App\Http\Controllers\PengajuanTempatKPController;
 use App\Http\Controllers\EvaluasiKPController;
 
@@ -80,19 +80,21 @@ Route::get('/surat-pengantar/{id}/download', [SuratPengantarKPController::class,
 Route::get('/surat-pengantar/{id}/status', [SuratPengantarKPController::class, 'getStatus']);
 
 
-Route::apiResource('seminars', SeminarController::class);
-Route::post('seminars/{seminar}/assign-examiners', [SeminarController::class, 'assignExaminers']);
-Route::post('seminars/{seminar}/notify', [SeminarController::class, 'notify']);
-Route::get('/penilaian', [PenilaianKPController::class, 'index']);
-Route::post('/penilaian', [PenilaianKPController::class, 'store']);
-Route::get('/penilaian/{id}', [PenilaianKPController::class, 'show']);
-Route::put('/penilaian/{id}', [PenilaianKPController::class, 'update']);
-Route::delete('/penilaian/{id}', [PenilaianKPController::class, 'destroy']);
-Route::post('/laporan/upload', [PengumpulanLaporanKPController::class, 'upload']);
-Route::get('/laporan', [PengumpulanLaporanKPController::class, 'index']);
-Route::get('/laporan/{id}', [PengumpulanLaporanKPController::class, 'show']);
-Route::delete('/laporan/{id}', [PengumpulanLaporanKPController::class, 'destroy']);
-Route::post('/laporan/update/{id}', [PengumpulanLaporanKPController::class, 'update']);
+Route::get('/jadwal-seminar-kp', [JadwalSeminarKpController::class, 'index']);
+Route::post('/jadwal-seminar-kp', [JadwalSeminarKpController::class, 'store']);
+Route::get('/jadwal-seminar-kp/{jadwalSeminarKp}', [JadwalSeminarKpController::class, 'show']);
+Route::put('/jadwal-seminar-kp/{jadwalSeminarKp}', [JadwalSeminarKpController::class, 'update']);
+Route::delete('/jadwal-seminar-kp/{jadwalSeminarKp}', [JadwalSeminarKpController::class, 'destroy']);
+Route::get('/penilaian-kp', [PenilaianKPController::class, 'index']);
+Route::post('/penilaian-kp', [PenilaianKPController::class, 'store']);
+Route::get('/penilaian-kp/{id}', [PenilaianKPController::class, 'show']);
+Route::put('/penilaian-kp/{id}', [PenilaianKPController::class, 'update']);
+Route::delete('/penilaian-kp/{id}', [PenilaianKPController::class, 'destroy']);
+Route::post('/laporan-kp/upload', [LaporanKPController::class, 'upload']);
+Route::get('/laporan-kp', [LaporanKPController::class, 'index']);
+Route::get('/laporan-kp/{id}', [LaporanKPController::class, 'show']);
+Route::delete('/laporan-kp/{id}', [LaporanKPController::class, 'destroy']);
+Route::put('/laporan-kp/{id}', [LaporanKPController::class, 'update']);
 
 
 
@@ -127,6 +129,10 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->get('logbook', function (Request $request) {
     return Logbook::where('student_id', $request->user()->id)->get();
 });
-Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', function (Request $request) {
+        return $request->user();
+    });
+    
+    Route::get('/jadwal-seminar-me', [JadwalSeminarKPController::class, 'mySchedule']);
 });
