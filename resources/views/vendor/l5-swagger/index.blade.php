@@ -12,8 +12,8 @@
     <style>
         html { box-sizing: border-box; overflow-y: scroll; }
         *, *:before, *:after { box-sizing: inherit; }
-        body { margin: 0; background: #fafafa;
-            </style>
+        body { margin: 0; background: #fafafa; }
+    </style>
 </head>
 
 <body>
@@ -25,8 +25,8 @@
 
 <script>
     window.onload = function() {
-        // Ganti URL yang bermasalah dengan URL publik yang terverifikasi
-        const specUrl = "http://localhost/tb_abl/public/api-docs/api-docs.yaml"; 
+        // Pakai URL helper Laravel, bukan hardcode
+        const specUrl = "{{ url('/api-docs.yaml') }}"; 
         
         const ui = SwaggerUIBundle({
             url: specUrl,
@@ -36,7 +36,9 @@
                 SwaggerUIBundle.presets.apis,
                 SwaggerUIStandalonePreset
             ],
+            layout: "StandaloneLayout"
         });
+        
         window.ui = ui;
     };
 </script>
