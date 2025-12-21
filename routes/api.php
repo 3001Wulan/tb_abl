@@ -52,13 +52,16 @@ Route::put('logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
 Route::delete('logbook/{logbookId}', [LogbookController::class, 'destroyLogbook']);
 Route::post('/logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
 
+
 Route::post('/pendaftaran-kp', [PendaftaranKPController::class, 'daftar']);
 Route::post('/pendaftaran-kp/{id}/upload', [PendaftaranKPController::class, 'uploadBerkas']);
 Route::post('/pendaftaran-kp/{id}/validasi', [PendaftaranKPController::class, 'validasi']);
 Route::get('/pendaftaran-kp/{id}', [PendaftaranKPController::class, 'detail']);
-Route::get('/pendaftaran-kp', [PendaftaranKPController::class, 'daftarSemua']);
-Route::put('/pendaftaran-kp/{id}', [PendaftaranKPController::class, 'update']);
+Route::get('/pendaftaran-kp/saya/{studentId}', [PendaftaranKPController::class, 'daftarSaya']);
 Route::delete('/pendaftaran-kp/{id}', [PendaftaranKPController::class, 'delete']);
+Route::put('/pendaftaran-kp/{id}', [PendaftaranKPController::class, 'update']);
+
+
 Route::post('/informasi-kp/syarat', [InformasiKPController::class, 'storeSyarat']);
 Route::post('/informasi-kp/jadwal', [InformasiKPController::class, 'storeJadwal']);
 Route::post('/informasi-kp/template', [InformasiKPController::class, 'storeTemplate']);
@@ -135,4 +138,44 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     
     Route::get('/jadwal-seminar-me', [JadwalSeminarKPController::class, 'mySchedule']);
+});
+Route::prefix('informasi-kp')->group(function () {
+    // CREATE
+    Route::post('/', [InformasiKPController::class, 'store']);
+
+    // READ
+    Route::get('/', [InformasiKPController::class, 'index']);
+    Route::get('/{id}', [InformasiKPController::class, 'show']);
+
+    // UPDATE
+    Route::put('/{id}', [InformasiKPController::class, 'update']);
+
+    // DELETE
+    Route::delete('/{id}', [InformasiKPController::class, 'destroy']);
+});
+Route::prefix('surat-pengantar')->group(function () {
+
+    // Lihat semua pengajuan surat
+    Route::get('/', [SuratPengantarKPController::class, 'index']);
+
+    // Ajukan surat pengantar
+    Route::post('/', [SuratPengantarKPController::class, 'store']);
+
+    // Lihat detail pengajuan surat
+    Route::get('/{id}', [SuratPengantarKPController::class, 'show']);
+
+    // Buat PDF dari pengajuan surat
+    Route::post('/{id}/buat-pdf', [SuratPengantarKPController::class, 'buatPdf']);
+
+    // Tandatangani surat oleh Kaprodi/Jurusan
+    Route::post('/{id}/tandatangani', [SuratPengantarKPController::class, 'tandatangani']);
+
+    // Tolak pengajuan surat pengantar
+    Route::post('/{id}/tolak', [SuratPengantarKPController::class, 'tolak']);
+
+    // Download surat pengantar
+    Route::get('/{id}/download', [SuratPengantarKPController::class, 'download']);
+
+    Route::get('/surat-pengantar/{id}/status', [SuratPengantarKPController::class, 'getStatus']);
+
 });
