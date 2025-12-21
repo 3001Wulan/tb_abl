@@ -1,283 +1,306 @@
 <?php
-// File: app/Http/Controllers/PendaftaranKPController.php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\PendaftaranKP;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use App\Models\PendaftaranKP;
 
 class PendaftaranKPController extends Controller
 {
     /**
-     * 1. FORMULIR PENDAFTARAN (CREATE)
-     * POST /api/kp/daftar
-     */
+ * @OA\Post(
+ *     path="/pendaftaran-kp",
+ *     tags={"Pendaftaran KP"},
+ *     summary="Daftar Kerja Praktik",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 type="object",
+ *                 required={"student_id","judul_kp","lokasi","periode"},
+ *                 @OA\Property(property="student_id", type="integer", example=1),
+ *                 @OA\Property(property="judul_kp", type="string", example="KP Diskominfo"),
+ *                 @OA\Property(property="lokasi", type="string", example="Padang"),
+ *                 @OA\Property(property="periode", type="string", example="2026"),
+ *                 @OA\Property(property="proposal", type="string", format="binary")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=201, description="Pendaftaran KP berhasil"),
+ *     @OA\Response(response=422, description="Validasi gagal")
+ * )
+ */
+
     public function daftar(Request $request)
-    {
-        try {
-            // Validasi input
-            $validator = Validator::make($request->all(), [
-                'nama_mahasiswa' => 'required|string',
-                'nim' => 'required|string|unique:pendaftaran_kp,nim',
-                'email' => 'required|email|unique:pendaftaran_kp,email',
-                'no_hp' => 'required|string',
-                'jurusan' => 'required|string',
-                'universitas' => 'required|string',
-                'tema_kp' => 'nullable|string',
-                'perusahaan' => 'nullable|string'
-            ]);
+{
+    $validator = Validator::make($request->all(), [
+        'student_id' => 'required|integer',
+        'judul_kp'   => 'required|string',
+        'lokasi'     => 'required|string',
+        'periode'    => 'required|string',
+        'proposal'   => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+    ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Create pendaftaran
-            $pendaftaran = PendaftaranKP::create([
-                'nama_mahasiswa' => $request->nama_mahasiswa,
-                'nim' => $request->nim,
-                'email' => $request->email,
-                'no_hp' => $request->no_hp,
-                'jurusan' => $request->jurusan,
-                'universitas' => $request->universitas,
-                'tema_kp' => $request->tema_kp ?? 'Belum ditentukan',
-                'perusahaan' => $request->perusahaan ?? 'Belum ditentukan',
-                'status_validasi' => 'pending'
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Pendaftaran formulir berhasil dibuat',
-                'data' => $pendaftaran
-            ], 201);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
-        }
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Validasi gagal',
+            'errors'  => $validator->errors()
+        ], 422);
     }
 
-    /**
-     * 2. UPLOAD BERKAS
-     * POST /api/kp/upload/{id}
-     */
-    public function uploadBerkas(Request $request, $id)
+    $proposalPath = null;
+
+    if ($request->hasFile('proposal')) {
+        $proposalPath = $request->file('proposal')
+                                ->store('proposal_kp', 'public');
+    }
+
+    $data = PendaftaranKP::create([
+        'student_id' => $request->student_id,
+        'judul_kp'   => $request->judul_kp,
+        'lokasi'     => $request->lokasi,
+        'periode'    => $request->periode,
+        'proposal'   => $proposalPath,
+        'status'     => 'pending'
+    ]);
+
+    return response()->json([
+        'message' => 'Pendaftaran KP berhasil',
+        'data'    => $data
+    ], 201);
+}
+
+/**
+ * Ambil semua pendaftaran KP milik mahasiswa tertentu
+ *
+ * @OA\Get(
+ *     path="/pendaftaran-kp/saya/{studentId}",
+ *     tags={"Pendaftaran KP"},
+ *     summary="Ambil semua pendaftaran KP milik mahasiswa tertentu",
+ *     @OA\Parameter(
+ *         name="studentId",
+ *         in="path",
+ *         required=true,
+ *         description="ID mahasiswa",
+ *         @OA\Schema(type="integer", example=5)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Berhasil mengambil pendaftaran mahasiswa",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="student_id", type="integer", example=5),
+ *                     @OA\Property(property="judul_kp", type="string", example="KP Diskominfo"),
+ *                     @OA\Property(property="lokasi", type="string", example="Padang"),
+ *                     @OA\Property(property="periode", type="string", example="2026"),
+ *                     @OA\Property(property="proposal", type="string", nullable=true, example="/storage/proposal_kp/file.pdf"),
+ *                     @OA\Property(property="status", type="string", example="pending"),
+ *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-01-22T08:00:00Z"),
+ *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-01-22T08:00:00Z")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Data tidak ditemukan",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Data tidak ditemukan"),
+ *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+ *         )
+ *     )
+ * )
+ */
+
+    public function daftarSaya($studentId)
     {
-        try {
-            $pendaftaran = PendaftaranKP::findOrFail($id);
+        $pendaftaran = PendaftaranKP::where('student_id', $studentId)->get();
 
-            // Validasi file
-            $validator = Validator::make($request->all(), [
-                'krs' => 'nullable|mimes:pdf,doc,docx|max:5120',
-                'transkrip' => 'nullable|mimes:pdf,doc,docx|max:5120',
-                'proposal' => 'nullable|mimes:pdf,doc,docx|max:5120'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi file gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Upload KRS
-            if ($request->hasFile('krs')) {
-                $krsFile = $request->file('krs');
-                $krsPath = $krsFile->store('pendaftaran_kp/krs', 'public');
-                $pendaftaran->krs = $krsPath;
-            }
-
-            // Upload Transkrip
-            if ($request->hasFile('transkrip')) {
-                $transkripFile = $request->file('transkrip');
-                $transkripPath = $transkripFile->store('pendaftaran_kp/transkrip', 'public');
-                $pendaftaran->transkrip = $transkripPath;
-            }
-
-            // Upload Proposal
-            if ($request->hasFile('proposal')) {
-                $proposalFile = $request->file('proposal');
-                $proposalPath = $proposalFile->store('pendaftaran_kp/proposal', 'public');
-                $pendaftaran->proposal = $proposalPath;
-            }
-
-            $pendaftaran->save();
-
+        if ($pendaftaran->isEmpty()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Berkas berhasil diupload',
-                'data' => $pendaftaran
-            ], 200);
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data pendaftaran tidak ditemukan'
+                'message' => 'Data tidak ditemukan',
+                'data' => []
             ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
         }
+
+        $data = $pendaftaran->map(function($item) {
+            $item->proposal = $item->proposal ? asset('storage/' . $item->proposal) : null;
+            $item->created_at = $item->created_at->toIso8601String();
+            $item->updated_at = $item->updated_at->toIso8601String();
+            return $item;
+        });
+
+        return response()->json([
+            'data' => $data
+        ], 200);
     }
 
     /**
-     * 3. VALIDASI BERKAS
-     * POST /api/kp/validasi/{id}
-     */
-    public function validasi(Request $request, $id)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'status_validasi' => 'required|in:pending,valid,invalid',
-                'catatan_validasi' => 'nullable|string'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $pendaftaran = PendaftaranKP::findOrFail($id);
-
-            // Cek apakah semua berkas sudah diupload
-            if ($request->status_validasi == 'valid' && (!$pendaftaran->krs || !$pendaftaran->transkrip || !$pendaftaran->proposal)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak semua berkas telah diupload'
-                ], 422);
-            }
-
-            $pendaftaran->status_validasi = $request->status_validasi;
-            $pendaftaran->catatan_validasi = $request->catatan_validasi;
-            $pendaftaran->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Status validasi berhasil diperbarui',
-                'data' => $pendaftaran
-            ], 200);
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data pendaftaran tidak ditemukan'
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * 4. GET DETAIL PENDAFTARAN
-     * GET /api/kp/detail/{id}
+     * @OA\Get(
+     *     path="/pendaftaran-kp/{id}",
+     *     tags={"Pendaftaran KP"},
+     *     summary="Detail pendaftaran KP",
+     *     @OA\Parameter(
+     *         name="id", in="path", required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="OK"),
+     *     @OA\Response(response=404, description="Data tidak ditemukan")
+     * )
      */
     public function detail($id)
     {
-        try {
-            $pendaftaran = PendaftaranKP::findOrFail($id);
+        $data = PendaftaranKP::find($id);
 
-            return response()->json([
-                'success' => true,
-                'data' => $pendaftaran
-            ], 200);
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data pendaftaran tidak ditemukan'
-            ], 404);
+        if (!$data) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
+
+        return response()->json(['data' => $data], 200);
+    }
+/**
+ * @OA\Post(
+ *     path="/pendaftaran-kp/{id}",
+ *     operationId="updatePendaftaranKP",
+ *     tags={"Pendaftaran KP"},
+ *     summary="Update pendaftaran KP + upload proposal",
+ *     description="Endpoint menggunakan POST + _method=PUT untuk kompatibilitas browser. Di API client bisa langsung PUT.",
+ *
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID pendaftaran KP",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 type="object",
+ *                 required={"_method"},
+ *                 @OA\Property(
+ *                     property="_method",
+ *                     type="string",
+ *                     example="PUT",
+ *                     description="Method spoofing untuk Laravel agar POST dianggap PUT"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="judul_kp",
+ *                     type="string",
+ *                     example="KP Diskominfo",
+ *                     description="Judul Kerja Praktik"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="lokasi",
+ *                     type="string",
+ *                     example="Padang",
+ *                     description="Lokasi Kerja Praktik"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="periode",
+ *                     type="string",
+ *                     example="2026",
+ *                     description="Periode KP"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="status",
+ *                     type="string",
+ *                     example="pending",
+ *                     description="Status pendaftaran KP"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="proposal",
+ *                     type="string",
+ *                     format="binary",
+ *                     description="File proposal (pdf, doc, docx) - opsional"
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Data berhasil diperbarui",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Data berhasil diperbarui"),
+ *             @OA\Property(property="data", type="object")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Data tidak ditemukan",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Data tidak ditemukan")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validasi gagal",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Validasi gagal"),
+ *             @OA\Property(property="errors", type="object")
+ *         )
+ *     )
+ * )
+ */
+
+
+
+public function update(Request $request, $id)
+{
+    $data = PendaftaranKP::findOrFail($id);
+
+    $validated = $request->validate([
+        'judul_kp' => 'nullable|string',
+        'lokasi'   => 'nullable|string',
+        'periode'  => 'nullable|string',
+        'status'   => 'nullable|string',
+        'proposal' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+    ]);
+
+    // Update field text
+    $data->fill($request->only([
+        'judul_kp',
+        'lokasi',
+        'periode',
+        'status'
+    ]));
+
+    // Upload proposal jika ada
+    if ($request->hasFile('proposal')) {
+        // Hapus file lama jika ada
+        if ($data->proposal && \Storage::disk('public')->exists($data->proposal)) {
+            \Storage::disk('public')->delete($data->proposal);
+        }
+
+        // Simpan file baru
+        $data->proposal = $request->file('proposal')->store('proposal_kp', 'public');
     }
 
-    /**
-     * 5. GET SEMUA PENDAFTARAN
-     * GET /api/kp/daftar-semua
-     */
-    public function daftarSemua()
-    {
-        try {
-            $pendaftaran = PendaftaranKP::all();
+    $data->save();
 
-            return response()->json([
-                'success' => true,
-                'total' => $pendaftaran->count(),
-                'data' => $pendaftaran
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * 6. UPDATE PENDAFTARAN
-     * PUT /api/kp/update/{id}
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'nama_mahasiswa' => 'sometimes|string',
-                'email' => 'sometimes|email',
-                'no_hp' => 'sometimes|string',
-                'tema_kp' => 'sometimes|string',
-                'perusahaan' => 'sometimes|string'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $pendaftaran = PendaftaranKP::findOrFail($id);
-            $pendaftaran->update($request->all());
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data berhasil diperbarui',
-                'data' => $pendaftaran
-            ], 200);
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data pendaftaran tidak ditemukan'
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * 7. DELETE PENDAFTARAN
-     * DELETE /api/kp/hapus/{id}
-     */
-    public function delete($id)
+    return response()->json([
+        'message' => 'Data berhasil diperbarui',
+        'data' => $data
+    ], 200);
+}
+public function delete($id)
     {
         try {
             $pendaftaran = PendaftaranKP::findOrFail($id);
