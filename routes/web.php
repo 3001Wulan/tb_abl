@@ -5,6 +5,9 @@ use App\Http\Controllers\LogbookController;
 use App\Http\Controllers\JadwalSeminarKPController;
 use App\Http\Controllers\PenilaianKPController;
 use App\Http\Controllers\LaporanKPController;
+use App\Models\PendaftaranKP;
+
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -21,7 +24,7 @@ Route::get('/register', function () {
 
 Route::get('/dashboard', function () {
     return view('mahasiswa.dashboard'); 
-})->name('dashboard'); // ini salah tulis 'register', harusnya 'dashboard'
+})->name('dashboard'); 
 
 Route::get('/mahasiswa/logbook', function () {
     return view('mahasiswa.logbook');
@@ -45,14 +48,14 @@ Route::get('/mahasiswa/logbook/{id}/edit', [LogbookController::class, 'edit'])
     Route::get('/mahasiswa/laporan-akhir/upload', [LaporanKPController::class, 'showUploadForm'])
         ->name('mahasiswa.laporan-upload');
 
-// HAPUS salah satu route duplikat, pakai yang ini saja:
+
 Route::get('/api/documentation', function () {
     return view('vendor.l5-swagger.index', [
         'documentation' => 'default',
     ]);
 })->name('l5-swagger.api');
 
-// Route untuk file YAML
+
 Route::get('/api-docs.yaml', function () {
     $path = storage_path('api-docs/api-docs.yaml');
 
@@ -64,3 +67,22 @@ Route::get('/api-docs.yaml', function () {
         'Content-Type' => 'application/x-yaml'
     ]);
 });
+
+Route::get('/pendaftaran-kp', function () {
+    return view('mahasiswa.PendaftaranKP');
+})->name('pendaftaran.kp');
+
+Route::get('/pendaftaran-kp/tambah', function () {
+    return view('mahasiswa.TambahPendaftaranKP'); 
+})->name('pendaftaran.kp.tambah');
+
+Route::get('/pendaftaran-kp/edit/{id}', function ($id) {
+    $pendaftaran = PendaftaranKP::find($id);
+
+    if (!$pendaftaran) {
+        return redirect()->route('pendaftaran.kp')
+                         ->with('error', "Data pendaftaran dengan ID $id tidak ditemukan!");
+    }
+
+    return view('mahasiswa.EditPendaftaranKP', ['pendaftaran' => $pendaftaran]);
+})->name('pendaftaran.kp.edit');
