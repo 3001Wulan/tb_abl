@@ -274,7 +274,6 @@ public function update(Request $request, $id)
         'proposal' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
     ]);
 
-    // Update field text
     $data->fill($request->only([
         'judul_kp',
         'lokasi',
@@ -282,14 +281,11 @@ public function update(Request $request, $id)
         'status'
     ]));
 
-    // Upload proposal jika ada
     if ($request->hasFile('proposal')) {
-        // Hapus file lama jika ada
         if ($data->proposal && \Storage::disk('public')->exists($data->proposal)) {
             \Storage::disk('public')->delete($data->proposal);
         }
 
-        // Simpan file baru
         $data->proposal = $request->file('proposal')->store('proposal_kp', 'public');
     }
 

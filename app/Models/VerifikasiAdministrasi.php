@@ -36,7 +36,6 @@ class VerifikasiAdministrasi extends Model
         'proposal_lengkap' => 'boolean'
     ];
 
-    // Relasi ke Pendaftaran KP
     public function pendaftaranKP()
     {
         return $this->belongsTo(PendaftaranKP::class, 'pendaftaran_kp_id');

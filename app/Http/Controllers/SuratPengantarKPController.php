@@ -45,7 +45,7 @@ class SuratPengantarKPController extends Controller
 
     $surat = SuratPengantarKP::create([
         'pendaftaran_kp_id' => $request->pendaftaran_kp_id,
-        'nomor_surat' => 'SURAT-'.time(), // otomatis generate nomor surat
+        'nomor_surat' => 'SURAT-'.time(), 
         'jurusan' => $request->jurusan ?? null,
         'nama_pembimbing_akademik' => $request->nama_pembimbing_akademik ?? null,
         'nip_pembimbing' => $request->nip_pembimbing ?? null,
@@ -126,7 +126,6 @@ class SuratPengantarKPController extends Controller
         if (!$surat) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
         if ($surat->status != 'pending') return response()->json(['success' => false, 'message' => 'Surat tidak dalam status pending'], 422);
 
-        // Generate PDF dummy
         $path = 'surat_kp_'.$id.'.pdf';
         Storage::put($path, 'Isi PDF surat pengantar KP #'.$id);
 
@@ -271,12 +270,11 @@ class SuratPengantarKPController extends Controller
 
     return response()->json([
         'success' => true,
-        'status' => $surat->status_pengajuan, // sesuaikan dengan nama kolom
+        'status' => $surat->status_pengajuan, 
         'pesan' => $this->getPesanStatus($surat->status_pengajuan)
     ], 200);
 }
 
-// Helper untuk generate pesan status
 private function getPesanStatus($status)
 {
     $pesan = [

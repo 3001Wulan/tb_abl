@@ -8,10 +8,7 @@ use App\Models\PendaftaranKP;
 
 class VerifikasiAdministrasiController extends Controller
 {
-    /**
-     * 1. CREATE - Buat Verifikasi Baru
-     * POST /api/verifikasi-admin
-     */
+    
     public function store(Request $request)
     {
         try {
@@ -48,10 +45,6 @@ class VerifikasiAdministrasiController extends Controller
         }
     }
 
-    /**
-     * 2. GET ALL - Lihat Semua Verifikasi
-     * GET /api/verifikasi-admin
-     */
     public function index()
     {
         try {
@@ -71,10 +64,7 @@ class VerifikasiAdministrasiController extends Controller
         }
     }
 
-    /**
-     * 3. GET DETAIL - Lihat Detail Verifikasi
-     * GET /api/verifikasi-admin/{id}
-     */
+
     public function show($id)
     {
         try {
@@ -93,10 +83,6 @@ class VerifikasiAdministrasiController extends Controller
         }
     }
 
-    /**
-     * 4. CEK KELENGKAPAN - Periksa Kelengkapan Berkas
-     * POST /api/verifikasi-admin/{id}/cek-kelengkapan
-     */
     public function cekKelengkapan(Request $request, $id)
     {
         try {
@@ -117,7 +103,6 @@ class VerifikasiAdministrasiController extends Controller
                 'tanggal_verifikasi' => now()
             ]);
 
-            // Update status verifikasi
             $semuaLengkap = $request->krs_lengkap && $request->transkrip_lengkap && $request->proposal_lengkap;
             $verifikasi->status_verifikasi = $semuaLengkap ? 'lengkap' : 'tidak_lengkap';
             $verifikasi->save();
@@ -136,10 +121,6 @@ class VerifikasiAdministrasiController extends Controller
         }
     }
 
-    /**
-     * 5. SETUJUI - Menyetujui Pengajuan
-     * POST /api/verifikasi-admin/{id}/setujui
-     */
     public function setujui(Request $request, $id)
     {
         try {
@@ -178,10 +159,6 @@ class VerifikasiAdministrasiController extends Controller
         }
     }
 
-    /**
-     * 6. TOLAK - Menolak Pengajuan
-     * POST /api/verifikasi-admin/{id}/tolak
-     */
     public function tolak(Request $request, $id)
     {
         try {
@@ -215,10 +192,6 @@ class VerifikasiAdministrasiController extends Controller
         }
     }
 
-    /**
-     * 7. GET STATUS MAHASISWA - Lihat Status Pengajuan
-     * GET /api/verifikasi-admin/{id}/status-mahasiswa
-     */
     public function getStatusMahasiswa($id)
     {
         try {

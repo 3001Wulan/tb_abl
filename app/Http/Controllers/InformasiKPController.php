@@ -27,7 +27,6 @@ use Illuminate\Http\Request;
  */
 class InformasiKPController extends Controller
 {
-    // ==================== CREATE / POST ====================
     /**
      * @OA\Post(
      *     path="/api/informasi-kp",
@@ -80,7 +79,6 @@ class InformasiKPController extends Controller
         ], 201);
     }
 
-    // ==================== READ / GET ====================
     /**
      * @OA\Get(
      *     path="/api/informasi-kp",
@@ -133,7 +131,6 @@ class InformasiKPController extends Controller
         return response()->json($informasi, 200);
     }
 
-    // ==================== UPDATE / PUT ====================
     /**
      * @OA\Put(
      *     path="/api/informasi-kp/{id}",
@@ -178,7 +175,6 @@ class InformasiKPController extends Controller
         ], 200);
     }
 
-    // ==================== DELETE / DELETE ====================
     /**
      * @OA\Delete(
      *     path="/api/informasi-kp/{id}",

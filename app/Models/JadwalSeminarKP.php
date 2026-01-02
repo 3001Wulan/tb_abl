@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class JadwalSeminarKp extends Model
 {
-    // Wajib karena nama tabel tidak plural standar Laravel
     protected $table = 'jadwal_seminar_kp';
 
     protected $fillable = [
