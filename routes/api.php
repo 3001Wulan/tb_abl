@@ -24,6 +24,7 @@ use App\Http\Controllers\PenilaianKPController;
 use App\Http\Controllers\LaporanKPController;
 use App\Http\Controllers\PengajuanTempatKPController;
 use App\Http\Controllers\EvaluasiKPController;
+use App\Http\Controllers\RiwayatRevisiLaporanController;
 
 
 
@@ -97,6 +98,13 @@ Route::get('/laporan-kp', [LaporanKPController::class, 'index']);
 Route::get('/laporan-kp/{id}', [LaporanKPController::class, 'show']);
 Route::delete('/laporan-kp/{id}', [LaporanKPController::class, 'destroy']);
 Route::put('/laporan-kp/{id}', [LaporanKPController::class, 'update']);
+Route::get('/riwayat-revisi-laporan/{laporanKpId}', [RiwayatRevisiLaporanController::class, 'index']);
+Route::post('/riwayat-revisi-laporan/{laporanKpId}', [RiwayatRevisiLaporanController::class, 'store']);
+Route::get('/riwayat-revisi-laporan/versi/{riwayatRevisi}', [RiwayatRevisiLaporanController::class, 'show']);
+Route::post('/riwayat-revisi-laporan/versi/{riwayatRevisiId}/tandai-final', [RiwayatRevisiLaporanController::class, 'tandaiFinal']);
+Route::get('/riwayat-revisi-laporan/versi/{riwayatRevisi}/download', [RiwayatRevisiLaporanController::class, 'download']);
+Route::delete('/riwayat-revisi-laporan/versi/{riwayatRevisi}', [RiwayatRevisiLaporanController::class, 'destroy']);
+Route::post('/riwayat-revisi-laporan/{laporanKpId}/compare', [RiwayatRevisiLaporanController::class, 'compare']);
 
 
 

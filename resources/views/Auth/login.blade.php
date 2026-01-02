@@ -45,7 +45,7 @@
     <div class="card bg-red-400 shadow-lg w-full h-full rounded-3xl absolute transform rotate-6 transition-all duration-500 hover:rotate-0 hover:scale-105 opacity-80"></div>
 
     <div class="relative w-full rounded-3xl px-8 py-12 bg-white/90 shadow-md backdrop-blur-sm">
-      <h2 class="block mt-3 text-xl text-gray-700 text-center font-bold mb-8">Login Mahasiswa</h2>
+      <h2 class="block mt-3 text-xl text-gray-700 text-center font-bold mb-8">Login</h2>
 
       <form id="loginForm">
         <div>
