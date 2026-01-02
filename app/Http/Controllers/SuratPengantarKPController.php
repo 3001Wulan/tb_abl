@@ -5,302 +5,287 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SuratPengantarKP;
 use App\Models\PendaftaranKP;
+use Illuminate\Support\Facades\Storage;
 
 class SuratPengantarKPController extends Controller
 {
+   /**
+ * @OA\Post(
+ *     path="/api/surat-pengantar",
+ *     tags={"Surat Pengantar KP"},
+ *     summary="Ajukan surat pengantar KP",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"pendaftaran_kp_id","nama_perusahaan"},
+ *             @OA\Property(property="pendaftaran_kp_id", type="integer", example=1),
+ *             @OA\Property(property="nama_perusahaan", type="string", example="PT. ABC"),
+ *             @OA\Property(property="alamat_perusahaan", type="string", example="Jl. Sudirman No.1"),
+ *             @OA\Property(property="kontak_perusahaan", type="string", example="08123456789"),
+ *             @OA\Property(property="catatan_pengajuan", type="string", example="Mohon segera diproses"),
+ *             @OA\Property(property="jurusan", type="string", example="Teknik Informatika"),
+ *             @OA\Property(property="nama_pembimbing_akademik", type="string", example="Dr. Budi"),
+ *             @OA\Property(property="nip_pembimbing", type="string", example="12345678")
+ *         )
+ *     ),
+ *     @OA\Response(response=201, description="Berhasil membuat pengajuan surat"),
+ *     @OA\Response(response=422, description="Validasi gagal"),
+ *     @OA\Response(response=500, description="Terjadi kesalahan server")
+ * )
+ */
+
+   public function store(Request $request)
+{
+    $request->validate([
+        'pendaftaran_kp_id' => 'required|exists:pendaftaran_kp,id',
+        'jurusan' => 'nullable|string',
+        'nama_pembimbing_akademik' => 'nullable|string',
+        'nip_pembimbing' => 'nullable|string',
+    ]);
+
+    $surat = SuratPengantarKP::create([
+        'pendaftaran_kp_id' => $request->pendaftaran_kp_id,
+        'nomor_surat' => 'SURAT-'.time(), // otomatis generate nomor surat
+        'jurusan' => $request->jurusan ?? null,
+        'nama_pembimbing_akademik' => $request->nama_pembimbing_akademik ?? null,
+        'nip_pembimbing' => $request->nip_pembimbing ?? null,
+        'status_pengajuan' => 'pending',
+        'status_penandatanganan' => 'menunggu',
+        'file_path' => null,
+        'nama_file_pdf' => null,
+        'nama_penandatangan' => null,
+        'jabatan_penandatangan' => null,
+        'tanggal_penandatanganan' => null,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'data' => $surat
+    ], 201);
+}
+
     /**
-     * 1. CREATE - Mahasiswa Mengajukan Surat
-     * POST /api/surat-pengantar
-     */
-    public function store(Request $request)
-    {
-        try {
-            $request->validate([
-                'pendaftaran_kp_id' => 'required|exists:pendaftaran_kp,id',
-                'nama_perusahaan' => 'required|string',
-                'alamat_perusahaan' => 'nullable|string',
-                'kontak_perusahaan' => 'nullable|string',
-                'catatan_pengajuan' => 'nullable|string'
-            ]);
-
-            $pendaftaran = PendaftaranKP::findOrFail($request->pendaftaran_kp_id);
-            
-            $nomor = 'SP-' . date('YmdHis') . '-' . rand(1000, 9999);
-
-            $surat = SuratPengantarKP::create([
-                'pendaftaran_kp_id' => $request->pendaftaran_kp_id,
-                'nomor_surat' => $nomor,
-                'nama_mahasiswa' => $pendaftaran->nama_mahasiswa,
-                'nim' => $pendaftaran->nim,
-                'jurusan' => $pendaftaran->jurusan,
-                'universitas' => $pendaftaran->universitas,
-                'nama_perusahaan' => $request->nama_perusahaan,
-                'alamat_perusahaan' => $request->alamat_perusahaan,
-                'kontak_perusahaan' => $request->kontak_perusahaan,
-                'catatan_pengajuan' => $request->catatan_pengajuan,
-                'tanggal_pengajuan' => now()->toDateString(),
-                'status_pengajuan' => 'pending',
-                'status_penandatanganan' => 'menunggu'
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Pengajuan surat pengantar berhasil dibuat',
-                'data' => $surat
-            ], 201);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * 2. GET ALL - Lihat Semua Pengajuan Surat
-     * GET /api/surat-pengantar
+     * @OA\Get(
+     *     path="/api/surat-pengantar",
+     *     tags={"Surat Pengantar KP"},
+     *     summary="Lihat semua pengajuan surat",
+     *     @OA\Response(response=200, description="Berhasil mendapatkan data"),
+     *     @OA\Response(response=500, description="Terjadi kesalahan server")
+     * )
      */
     public function index()
     {
-        try {
-            $surat = SuratPengantarKP::all();
-
-            return response()->json([
-                'success' => true,
-                'total' => $surat->count(),
-                'data' => $surat
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        $surat = SuratPengantarKP::all();
+        return response()->json(['success' => true, 'data' => $surat], 200);
     }
 
     /**
-     * 3. GET DETAIL - Lihat Detail Pengajuan Surat
-     * GET /api/surat-pengantar/{id}
+     * @OA\Get(
+     *     path="/api/surat-pengantar/{id}",
+     *     tags={"Surat Pengantar KP"},
+     *     summary="Lihat detail pengajuan surat",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Berhasil mendapatkan data"),
+     *     @OA\Response(response=404, description="Data tidak ditemukan")
+     * )
      */
     public function show($id)
     {
-        try {
-            $surat = SuratPengantarKP::findOrFail($id);
-
-            return response()->json([
-                'success' => true,
-                'data' => $surat
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan'
-            ], 404);
+        $surat = SuratPengantarKP::find($id);
+        if (!$surat) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
         }
+        return response()->json(['success' => true, 'data' => $surat], 200);
     }
 
     /**
-     * 4. BUAT PDF - Jurusan Membuat File PDF
-     * POST /api/surat-pengantar/{id}/buat-pdf
+     * @OA\Post(
+     *     path="/api/surat-pengantar/{id}/buat-pdf",
+     *     tags={"Surat Pengantar KP"},
+     *     summary="Buat file PDF dari pengajuan surat",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="PDF berhasil dibuat"),
+     *     @OA\Response(response=422, description="Surat tidak dalam status pending"),
+     *     @OA\Response(response=404, description="Data tidak ditemukan"),
+     *     @OA\Response(response=500, description="Terjadi kesalahan server")
+     * )
      */
     public function buatPDF($id)
     {
-        try {
-            $surat = SuratPengantarKP::findOrFail($id);
+        $surat = SuratPengantarKP::find($id);
+        if (!$surat) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        if ($surat->status != 'pending') return response()->json(['success' => false, 'message' => 'Surat tidak dalam status pending'], 422);
 
-            // Hanya bisa buat PDF jika status pending
-            if ($surat->status_pengajuan !== 'pending') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Surat harus dalam status pending untuk membuat PDF'
-                ], 422);
-            }
+        // Generate PDF dummy
+        $path = 'surat_kp_'.$id.'.pdf';
+        Storage::put($path, 'Isi PDF surat pengantar KP #'.$id);
 
-            // Simulasi pembuatan PDF
-            $namaFile = 'SP-' . $surat->nim . '-' . date('YmdHis') . '.pdf';
-            $filePath = 'surat_pengantar/' . $namaFile;
+        $surat->status = 'proses';
+        $surat->save();
 
-            $surat->file_path = $filePath;
-            $surat->nama_file_pdf = $namaFile;
-            $surat->status_pengajuan = 'proses';
-            $surat->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'PDF surat berhasil dibuat',
-                'data' => $surat
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json(['success' => true, 'message' => 'PDF berhasil dibuat', 'path' => $path], 200);
     }
 
     /**
-     * 5. TANDATANGANI - Tanda Tangan Kaprodi/Jurusan
-     * POST /api/surat-pengantar/{id}/tandatangani
+     * @OA\Post(
+     *     path="/api/surat-pengantar/{id}/tandatangani",
+     *     tags={"Surat Pengantar KP"},
+     *     summary="Tandatangani surat pengantar oleh Kaprodi/Jurusan",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama_penandatangan","jabatan_penandatangan"},
+     *             @OA\Property(property="nama_penandatangan", type="string", example="Dr. Budi"),
+     *             @OA\Property(property="jabatan_penandatangan", type="string", example="Kaprodi TI")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Surat berhasil ditandatangani"),
+     *     @OA\Response(response=422, description="Surat tidak dalam status proses"),
+     *     @OA\Response(response=404, description="Data tidak ditemukan"),
+     *     @OA\Response(response=500, description="Terjadi kesalahan server")
+     * )
      */
     public function tandatangani(Request $request, $id)
     {
-        try {
-            $request->validate([
-                'nama_penandatangan' => 'required|string',
-                'jabatan_penandatangan' => 'required|string'
-            ]);
+        $request->validate([
+            'nama_penandatangan' => 'required|string',
+            'jabatan_penandatangan' => 'required|string',
+        ]);
 
-            $surat = SuratPengantarKP::findOrFail($id);
+        $surat = SuratPengantarKP::find($id);
+        if (!$surat) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        if ($surat->status != 'proses') return response()->json(['success' => false, 'message' => 'Surat tidak dalam status proses'], 422);
 
-            // Hanya bisa tandatangan jika status proses
-            if ($surat->status_pengajuan !== 'proses') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Surat harus dalam status proses untuk ditandatangani'
-                ], 422);
-            }
+        $surat->nama_penandatangan = $request->nama_penandatangan;
+        $surat->jabatan_penandatangan = $request->jabatan_penandatangan;
+        $surat->status = 'selesai';
+        $surat->save();
 
-            $surat->nama_penandatangan = $request->nama_penandatangan;
-            $surat->jabatan_penandatangan = $request->jabatan_penandatangan;
-            $surat->tanggal_penandatanganan = now()->toDateString();
-            $surat->status_penandatanganan = 'sudah_ditandatangani';
-            $surat->status_pengajuan = 'selesai';
-            $surat->tanggal_selesai = now()->toDateString();
-            $surat->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Surat berhasil ditandatangani',
-                'data' => $surat
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json(['success' => true, 'message' => 'Surat berhasil ditandatangani'], 200);
     }
 
     /**
-     * 6. TOLAK - Tolak Pengajuan Surat
-     * POST /api/surat-pengantar/{id}/tolak
+     * @OA\Post(
+     *     path="/api/surat-pengantar/{id}/tolak",
+     *     tags={"Surat Pengantar KP"},
+     *     summary="Tolak pengajuan surat pengantar",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"alasan_penolakan"},
+     *             @OA\Property(property="alasan_penolakan", type="string", example="Dokumen tidak lengkap")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Pengajuan surat berhasil ditolak"),
+     *     @OA\Response(response=422, description="Surat tidak dalam status pending"),
+     *     @OA\Response(response=404, description="Data tidak ditemukan"),
+     *     @OA\Response(response=500, description="Terjadi kesalahan server")
+     * )
      */
     public function tolak(Request $request, $id)
     {
-        try {
-            $request->validate([
-                'alasan_penolakan' => 'required|string'
-            ]);
+        $request->validate([
+            'alasan_penolakan' => 'required|string',
+        ]);
 
-            $surat = SuratPengantarKP::findOrFail($id);
+        $surat = SuratPengantarKP::find($id);
+        if (!$surat) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        if ($surat->status != 'pending') return response()->json(['success' => false, 'message' => 'Surat tidak dalam status pending'], 422);
 
-            // Hanya bisa tolak jika status pending
-            if ($surat->status_pengajuan !== 'pending') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Surat harus dalam status pending untuk ditolak'
-                ], 422);
-            }
+        $surat->alasan_penolakan = $request->alasan_penolakan;
+        $surat->status = 'ditolak';
+        $surat->save();
 
-            $surat->status_pengajuan = 'ditolak';
-            $surat->alasan_penolakan = $request->alasan_penolakan;
-            $surat->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Pengajuan surat berhasil ditolak',
-                'data' => $surat
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json(['success' => true, 'message' => 'Pengajuan surat berhasil ditolak'], 200);
     }
 
     /**
-     * 7. DOWNLOAD - Mahasiswa Mengunduh Surat
-     * GET /api/surat-pengantar/{id}/download
+     * @OA\Get(
+     *     path="/api/surat-pengantar/{id}/download",
+     *     tags={"Surat Pengantar KP"},
+     *     summary="Download surat pengantar",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Surat siap diunduh"),
+     *     @OA\Response(response=422, description="Surat belum selesai/ditandatangani"),
+     *     @OA\Response(response=404, description="Data/file tidak ditemukan")
+     * )
      */
     public function download($id)
     {
-        try {
-            $surat = SuratPengantarKP::findOrFail($id);
+        $surat = SuratPengantarKP::find($id);
+        if (!$surat) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        if ($surat->status != 'selesai') return response()->json(['success' => false, 'message' => 'Surat belum selesai/ditandatangani'], 422);
 
-            // Hanya bisa download jika status selesai
-            if ($surat->status_pengajuan !== 'selesai') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Surat belum selesai/ditandatangani'
-                ], 422);
-            }
+        $path = 'surat_kp_'.$id.'.pdf';
+        if (!Storage::exists($path)) return response()->json(['success' => false, 'message' => 'File tidak ditemukan'], 404);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Surat siap diunduh',
-                'data' => [
-                    'nomor_surat' => $surat->nomor_surat,
-                    'nama_file' => $surat->nama_file_pdf,
-                    'file_path' => $surat->file_path,
-                    'download_url' => '/storage/' . $surat->file_path
-                ]
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan'
-            ], 404);
-        }
+        return response()->download(storage_path('app/'.$path));
     }
 
     /**
-     * 8. GET STATUS - Lihat Status Surat
-     * GET /api/surat-pengantar/{id}/status
+     * @OA\Get(
+     *     path="/api/surat-pengantar/{id}/status",
+     *     tags={"Surat Pengantar KP"},
+     *     summary="Lihat status pengajuan surat",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Berhasil mendapatkan status"),
+     *     @OA\Response(response=404, description="Data tidak ditemukan")
+     * )
      */
     public function getStatus($id)
-    {
-        try {
-            $surat = SuratPengantarKP::findOrFail($id);
+{
+    $surat = SuratPengantarKP::find($id);
+    if (!$surat) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'nomor_surat' => $surat->nomor_surat,
-                    'nama_mahasiswa' => $surat->nama_mahasiswa,
-                    'status_pengajuan' => $surat->status_pengajuan,
-                    'status_penandatanganan' => $surat->status_penandatanganan,
-                    'pesan_status' => $this->getPesanStatus($surat->status_pengajuan)
-                ]
-            ], 200);
+    return response()->json([
+        'success' => true,
+        'status' => $surat->status_pengajuan, // sesuaikan dengan nama kolom
+        'pesan' => $this->getPesanStatus($surat->status_pengajuan)
+    ], 200);
+}
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan'
-            ], 404);
-        }
-    }
+// Helper untuk generate pesan status
+private function getPesanStatus($status)
+{
+    $pesan = [
+        'pending' => 'Menunggu persetujuan dari jurusan',
+        'proses' => 'Sedang diproses, menunggu penandatanganan',
+        'selesai' => 'Surat sudah selesai dan siap diunduh',
+        'ditolak' => 'Pengajuan surat ditolak'
+    ];
+    return $pesan[$status] ?? 'Status tidak diketahui';
+}
 
-    /**
-     * Helper: Generate Pesan Status
-     */
-    private function getPesanStatus($status)
-    {
-        $pesan = [
-            'pending' => 'Menunggu persetujuan dari jurusan',
-            'proses' => 'Sedang diproses, menunggu penandatanganan',
-            'selesai' => 'Surat sudah selesai dan siap diunduh',
-            'ditolak' => 'Pengajuan surat ditolak'
-        ];
-
-        return $pesan[$status] ?? 'Status tidak diketahui';
-    }
 }

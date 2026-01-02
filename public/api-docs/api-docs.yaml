@@ -17,6 +17,22 @@ paths:
       summary: 'Login User'
       description: 'Gunakan email dan password untuk mendapatkan token.'
       operationId: a3b306d14572d1f4bd6c064b3233e7b8
+  /api/surat-pengantar:
+    get:
+      tags:
+        - 'Surat Pengantar KP'
+      summary: 'Lihat semua pengajuan surat'
+      operationId: 89ec5d855d92e1e68d7a11dbde2110e0
+      responses:
+        200:
+          description: 'Berhasil mendapatkan data'
+        500:
+          description: 'Terjadi kesalahan server'
+    post:
+      tags:
+        - 'Surat Pengantar KP'
+      summary: 'Ajukan Surat Pengantar KP'
+      operationId: e10f2a69e2752d486a2ce5497f0e23f0
       requestBody:
         required: true
         content:
@@ -38,6 +54,75 @@ paths:
       responses:
         200:
           description: 'Login Berhasil'
+                - pendaftaran_kp_id
+                - nama_perusahaan
+              properties:
+                pendaftaran_kp_id:
+                  type: integer
+                  example: 1
+                nama_perusahaan:
+                  type: string
+                  example: 'PT. ABC'
+                alamat_perusahaan:
+                  type: string
+                  example: 'Jl. Sudirman No.1'
+                kontak_perusahaan:
+                  type: string
+                  example: '08123456789'
+                catatan_pengajuan:
+                  type: string
+                  example: 'Mohon segera diproses'
+              type: object
+      responses:
+        201:
+          description: 'Berhasil membuat pengajuan surat'
+        500:
+          description: 'Terjadi kesalahan server'
+  '/api/surat-pengantar/{id}':
+    get:
+      tags:
+        - 'Surat Pengantar KP'
+      summary: 'Lihat detail pengajuan surat'
+      operationId: 30341ad2c860a47bb49b032219764b02
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Berhasil mendapatkan data'
+        404:
+          description: 'Data tidak ditemukan'
+  '/api/surat-pengantar/{id}/status':
+    get:
+      tags:
+        - 'Surat Pengantar KP'
+      summary: 'Lihat status pengajuan surat'
+      operationId: 8f212df89da908d9d32840cd2425aadd
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Berhasil mendapatkan status'
+        404:
+          description: 'Data tidak ditemukan'
+  /api/informasi-kp:
+    get:
+      tags:
+        - 'Informasi KP'
+      summary: 'Ambil semua Informasi KP'
+      operationId: f3f0406acad31fa975e3d4f90036f22d
+      responses:
+        200:
+          description: 'Daftar Informasi KP'
           content:
             application/json:
               schema:
@@ -60,6 +145,19 @@ paths:
       summary: 'Register Baru'
       description: 'Mendaftarkan user sekaligus membuat record Student dengan ID yang identik.'
       operationId: 8a56853624e025573120a09a4c75d468
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InformasiKP'
+                type: object
+    post:
+      tags:
+        - 'Informasi KP'
+      summary: 'Tambah Informasi KP'
+      operationId: d388cadd1a63a34e1991bb15816e00a9
       requestBody:
         required: true
         content:
@@ -92,6 +190,145 @@ paths:
       security:
         -
           bearerAuth: []
+                - jenis_informasi
+                - judul
+              properties:
+                jenis_informasi:
+                  type: string
+                  example: syarat
+                judul:
+                  type: string
+                  example: 'Syarat KP 2026'
+                deskripsi:
+                  type: string
+                  example: 'Deskripsi tambahan'
+                is_wajib:
+                  type: boolean
+                  example: true
+                periode:
+                  type: string
+                  example: 'Semester 2 2026'
+                tanggal_mulai:
+                  type: string
+                  format: date
+                  example: '2026-01-10'
+                tanggal_selesai:
+                  type: string
+                  format: date
+                  example: '2026-02-10'
+                urutan:
+                  type: integer
+                  example: 1
+                konten:
+                  type: string
+                  example: 'Isi prosedur'
+              type: object
+      responses:
+        201:
+          description: 'Informasi KP berhasil ditambahkan'
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: 'Informasi KP berhasil ditambahkan'
+                  data:
+                    $ref: '#/components/schemas/InformasiKP'
+                type: object
+  '/api/informasi-kp/{id}':
+    get:
+      tags:
+        - 'Informasi KP'
+      summary: 'Ambil Informasi KP berdasarkan ID'
+      operationId: b152f6a5edc2be1cb42d763659ee680f
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Informasi KP ditemukan'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformasiKP'
+        404:
+          description: 'Informasi KP tidak ditemukan'
+    put:
+      tags:
+        - 'Informasi KP'
+      summary: 'Update Informasi KP'
+      operationId: 31752e770b5c21cff240eeb95e7a3a86
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                jenis_informasi:
+                  type: string
+                  example: syarat
+                judul:
+                  type: string
+                  example: 'Syarat KP terbaru'
+                deskripsi:
+                  type: string
+                  example: 'Deskripsi terbaru'
+                is_wajib:
+                  type: boolean
+                  example: false
+              type: object
+      responses:
+        200:
+          description: 'Informasi KP berhasil diupdate'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformasiKP'
+        404:
+          description: 'Informasi KP tidak ditemukan'
+    delete:
+      tags:
+        - 'Informasi KP'
+      summary: 'Hapus Informasi KP'
+      operationId: c7b885f6f9069695100075da989ca1ad
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Informasi KP berhasil dihapus'
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: 'Informasi KP berhasil dihapus'
+                type: object
+        404:
+          description: 'Informasi KP tidak ditemukan'
   # Logbook (Siswa) - POST (Store)
   /api/logbook:
     post:
@@ -613,6 +850,848 @@ components:
           format: date-time
           example: '2025-01-22T08:00:00Z'
 
+
+  /api/jadwal-seminar-kp:
+    get:
+      tags:
+        - 'Jadwal Seminar KP'
+      summary: 'Menampilkan Semua Jadwal Seminar KP'
+      operationId: d9a7e7f52c3a80869166869168e59986
+      parameters:
+        -
+          name: page
+          in: query
+          description: Halaman
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: 'Data Semua Jadwal Seminar KP'
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/JadwalSeminarKP'
+                  links:
+                    type: object
+                  meta:
+                    type: object
+                type: object
+    post:
+      tags:
+        - 'Jadwal Seminar KP'
+      summary: 'Membuat Jadwal Seminar KP yang Baru'
+      operationId: 2038467a840ae137fe6a3de5a20bcb9f
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreJadwalSeminarKPRequest'
+      responses:
+        201:
+          description: 'Jadwal Berhasil dibuat'
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JadwalSeminarKP'
+                type: object
+        422:
+          description: 'Jadwal Gagal dibuat'
+  '/api/jadwal-seminar-kp/{id}':
+    get:
+      tags:
+        - 'Jadwal Seminar KP'
+      summary: 'Menampilkan Detail Satu Jadwal Seminar KP'
+      operationId: 8c554863d2a47b49921cf006c5698cb6
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID jadwal seminar KP'
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Detail Jadwal Seminar KP'
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JadwalSeminarKP'
+                type: object
+        404:
+          description: 'Jadwal Tidak Ditemukan'
+    put:
+      tags:
+        - 'Jadwal Seminar KP'
+      summary: 'Update/Edit Jadwal Seminar KP'
+      operationId: 8dc2335fa0679c4dcc11b28a3b7718a9
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID jadwal seminar KP'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJadwalSeminarKPRequest'
+      responses:
+        200:
+          description: 'Jadwal Berhasil Diperbarui'
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JadwalSeminarKP'
+                type: object
+        404:
+          description: 'Jadwal Tidak Ditemukan'
+        422:
+          description: 'Jadwal Gagal Diperbarui'
+    delete:
+      tags:
+        - 'Jadwal Seminar KP'
+      summary: 'Menghapus Jadwal Seminar KP'
+      operationId: d94554855e4342e64ea0284aa1941973
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID jadwal seminar KP'
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Jadwal Berhasil Dihapus'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Jadwal seminar KP berhasil dihapus'
+                type: object
+        404:
+          description: 'Jadwal Tidak Ditemukan'
+  /api/laporan-kp/upload:
+    post:
+      tags:
+        - 'Laporan KP'
+      summary: 'Upload laporan KP'
+      description: 'Upload file laporan KP dalam format PDF (maksimal 10MB)'
+      operationId: 8bd9c391db2eec5a0242ef2a04a3f50a
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - mahasiswa_id
+                - file_laporan
+              properties:
+                mahasiswa_id:
+                  description: 'ID mahasiswa'
+                  type: integer
+                  example: 1
+                file_laporan:
+                  description: 'File laporan dalam format PDF (max 10MB)'
+                  type: string
+                  format: binary
+              type: object
+      responses:
+        201:
+          description: 'Laporan berhasil diupload'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Laporan berhasil diupload'
+                  data:
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      mahasiswa_id:
+                        type: integer
+                        example: 1
+                      file_laporan:
+                        type: string
+                        example: laporan_kp/abc123.pdf
+                      is_format_valid:
+                        type: boolean
+                        example: true
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                    type: object
+                type: object
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'The file laporan field is required.'
+                  errors:
+                    properties:
+                      file_laporan:
+                        type: array
+                        items:
+                          type: string
+                          example: 'The file laporan must be a file of type: pdf.'
+                    type: object
+                type: object
+  /api/laporan-kp:
+    get:
+      tags:
+        - 'Laporan KP'
+      summary: 'List semua laporan KP'
+      description: 'Mengambil daftar semua laporan KP dengan optional filter'
+      operationId: ee4a1236ca65c4bbe44ebb865af0e86a
+      parameters:
+        -
+          name: format_valid
+          in: query
+          description: 'Filter berdasarkan validitas format (1 = valid, 0 = tidak valid)'
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 0
+              - 1
+      responses:
+        200:
+          description: 'List laporan berhasil diambil'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    mahasiswa_id:
+                      type: integer
+                      example: 1
+                    is_format_valid:
+                      type: boolean
+                      example: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                  type: object
+        404:
+          description: 'Tidak ada data ditemukan'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Tidak ada data ditemukan'
+                  data:
+                    type: array
+                    items: []
+                type: object
+  '/api/laporan-kp/{id}':
+    get:
+      tags:
+        - 'Laporan KP'
+      summary: 'Detail laporan KP'
+      description: 'Mengambil detail satu laporan KP berdasarkan ID'
+      operationId: 79526ce7c1a6c2fbe3b4861b5ded4b32
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID laporan KP'
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Detail laporan berhasil diambil'
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  mahasiswa_id:
+                    type: integer
+                    example: 1
+                  file_laporan:
+                    type: string
+                    example: laporan_kp/abc123.pdf
+                  is_format_valid:
+                    type: boolean
+                    example: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                type: object
+        404:
+          description: 'Data tidak ditemukan'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Data tidak ditemukan'
+                type: object
+    post:
+      tags:
+        - 'Laporan KP'
+      summary: 'Update laporan KP'
+      description: 'Update/replace file laporan KP yang sudah ada'
+      operationId: 63774275a7e9bbcc2731ebbad511ed54
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID laporan KP'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - file_laporan
+              properties:
+                file_laporan:
+                  description: 'File laporan baru dalam format PDF (max 10MB)'
+                  type: string
+                  format: binary
+                _method:
+                  description: 'Method spoofing untuk PUT request'
+                  type: string
+                  example: PUT
+              type: object
+      responses:
+        200:
+          description: 'Laporan berhasil diperbarui'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'File laporan berhasil diperbarui'
+                  data:
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      mahasiswa_id:
+                        type: integer
+                        example: 1
+                      file_laporan:
+                        type: string
+                        example: laporan_kp/xyz456.pdf
+                      is_format_valid:
+                        type: boolean
+                        example: true
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                    type: object
+                type: object
+        404:
+          description: 'Data tidak ditemukan'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Data tidak ditemukan'
+                type: object
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                type: object
+    delete:
+      tags:
+        - 'Laporan KP'
+      summary: 'Hapus laporan KP'
+      description: 'Menghapus laporan KP beserta filenya'
+      operationId: 52bf220bc87bbd97bc55a994ad23043c
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID laporan KP'
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Laporan berhasil dihapus'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Data berhasil dihapus'
+                type: object
+        404:
+          description: 'Data tidak ditemukan'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Data tidak ditemukan'
+                type: object
+  /api/penilaian-kp:
+    get:
+      tags:
+        - 'Penilaian KP'
+      summary: 'Menampilkan Semua Penilaian KP yang sudah diinputkan'
+      operationId: f82ce382d9529f74dbb6fddd6ca86adf
+      parameters:
+        -
+          name: mutu
+          in: query
+          description: 'Filter berdasarkan nilai mutu (A, A-, B+, B, B-, C+, C, D, E)'
+          required: false
+          schema:
+            type: string
+            enum:
+              - A
+              - A-
+              - B+
+              - B
+              - B-
+              - C+
+              - C
+              - D
+              - E
+      responses:
+        200:
+          description: 'Data Penilaian KP Berhasil ditampilkan'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PenilaianKP'
+    post:
+      tags:
+        - 'Penilaian KP'
+      summary: 'Membuat Penilaian KP yang baru'
+      operationId: b77fd17ffe92d0094204d162035bbb95
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorePenilaianKPRequest'
+      responses:
+        200:
+          description: 'Penilaian Berhasil dibuat'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PenilaianKP'
+        422:
+          description: 'Penilaian Gagal dibuat'
+  '/api/penilaian-kp/{id}':
+    get:
+      tags:
+        - 'Penilaian KP'
+      summary: 'Menampilkan Detail Penilaian KP salah satu mahasiswa'
+      operationId: 0ca4873561b89cb4e2547225a88a9064
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID penilaian KP'
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Data Penilaian Berhasil ditampilkan'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PenilaianKP'
+        404:
+          description: 'Data tidak ditemukan'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Data tidak ditemukan'
+                type: object
+    put:
+      tags:
+        - 'Penilaian KP'
+      summary: 'Update/Edit Penilaian KP'
+      operationId: 90796e85212bcf6c8588ad42e67afe65
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID penilaian KP'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePenilaianKPRequest'
+      responses:
+        200:
+          description: 'Penilaian Berhasil diperbarui'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PenilaianKP'
+        404:
+          description: 'Data tidak ditemukan'
+        422:
+          description: 'Data tidak ditemukan'
+    delete:
+      tags:
+        - 'Penilaian KP'
+      summary: 'Menghapus Penilaian KP'
+      operationId: bdeb5e60d9ac0010a44959cd9172dccd
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID penilaian KP'
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Penilaian Berhasil dihapus'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Penilaian Berhasil dihapus'
+                type: object
+        404:
+          description: 'Data tidak ditemukan'
+  /api/pendaftaran-kp:
+    post:
+      tags:
+        - 'Pendaftaran KP'
+      summary: 'Mendaftar Kerja Praktik'
+      requestBody:
+        required: true
+        content:
+           multipart/form-data:
+            schema:
+              type: object
+              required: [student_id, judul_kp, lokasi, periode,proposal]
+              properties:
+                student_id:
+                  type: integer
+                judul_kp:
+                  type: string
+                lokasi:
+                  type: string
+                periode:
+                  type: string
+                proposal:
+                  type: string
+                  format : binary
+      responses:
+        '201':
+          description: Created
+  /api/pendaftaran-kp/{studentId}:
+    get:
+      tags:
+        - Pendaftaran KP
+      summary: Ambil semua pendaftaran KP milik mahasiswa tertentu
+      description: Ambil semua pendaftaran KP milik mahasiswa tertentu berdasarkan student ID
+      operationId: daftarSaya
+      parameters:
+        - name: studentId
+          in: path
+          description: ID mahasiswa
+          required: true
+          schema:
+            type: integer
+            example: 5
+      responses:
+        '200':
+          description: Berhasil mengambil pendaftaran mahasiswa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 5
+                        judul_kp:
+                          type: string
+                          example: KP Diskominfo
+                        lokasi:
+                          type: string
+                          example: Padang
+                        periode:
+                          type: string
+                          example: '2026'
+                        proposal:
+                          type: string
+                          example: /storage/proposal_kp/file.pdf
+                          nullable: true
+                        status:
+                          type: string
+                          example: pending
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: '2025-01-22T08:00:00Z'
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: '2025-01-22T08:00:00Z'
+        '404':
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Data tidak ditemukan
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /api/pendaftaran-kp/{id}:
+    post:
+      tags:
+        - 'Pendaftaran KP'
+      summary: 'Update pendaftaran KP + upload proposal'
+      description: 'Endpoint menggunakan POST + _method=PUT untuk kompatibilitas browser. Di API client bisa langsung PUT.'
+      operationId: updatePendaftaranKP
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID pendaftaran KP'
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - _method
+              properties:
+                _method:
+                  description: 'Method spoofing untuk Laravel agar POST dianggap PUT'
+                  type: string
+                  example: PUT
+                judul_kp:
+                  description: 'Judul Kerja Praktik'
+                  type: string
+                  example: 'KP Diskominfo'
+                lokasi:
+                  description: 'Lokasi Kerja Praktik'
+                  type: string
+                  example: Padang
+                periode:
+                  description: 'Periode KP'
+                  type: string
+                  example: '2026'
+                status:
+                  description: 'Status pendaftaran KP'
+                  type: string
+                  example: pending
+                proposal:
+                  description: 'File proposal (pdf, doc, docx) - opsional'
+                  type: string
+                  format: binary
+              type: object
+      responses:
+        200:
+          description: 'Data berhasil diperbarui'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Data berhasil diperbarui'
+                  data:
+                    type: object
+                type: object
+        404:
+          description: 'Data tidak ditemukan'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Data tidak ditemukan'
+                type: object
+        422:
+          description: 'Validasi gagal'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: 'Validasi gagal'
+                  errors:
+                    type: object
+                type: object
+  
+    delete:
+      tags:
+        - 'Pendaftaran KP'
+      summary: 'Hapus pendaftaran KP'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+
+tags:
+  - name: 'Logbook (Siswa)'
+    description: 'Operasi CRUD dan Tracking Logbook kegiatan KP oleh Mahasiswa.'
+  - name: 'Validasi Logbook'
+    description: 'API untuk melakukan validasi logbook mahasiswa'
+  - name: Pembimbingan
+    description: 'API untuk penentuan, pembaruan, dan notifikasi dosen pembimbing'
+  - name: 'Surat Tugas'
+    description: 'API untuk pembuatan dan pengelolaan surat tugas pembimbing'
+  -
+    name: 'Jadwal Seminar KP'
+    description: 'Operasi CRUD untuk Mengelola Jadwal Seminar Kerja Praktek Mahasiswa'
+  -
+    name: 'Laporan KP'
+    description: 'API untuk manajemen laporan Kerja Praktik'
+  -
+    name: 'Penilaian KP'
+    description: 'Operasi CRUD untuk Mengelola Penilaian Kerja Praktek Mahasiswa'
+  
+  
+
+# --- KOMPONEN SKEMA (SCHEMAS) UNTUK REFERENSI YANG HILANG ---
+components:
+  schemas:
+    # 1. Skema LogbookKP (Model Dasar Logbook)
+    LogbookKP:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID unik Logbook.
+          example: 10
+        student_id:
+          type: integer
+          example: 5
+        minggu_ke:
+          type: integer
+          example: 3
+        tanggal_mulai:
+          type: string
+          format: date
+          example: '2025-01-20'
+        deskripsi_kegiatan:
+          type: string
+          example: 'Melakukan instalasi dan konfigurasi server.'
+        file_kegiatan_url:
+          type: string
+          nullable: true
+          description: URL ke file yang diunggah.
+          example: '/storage/logbook/5/week_3_file.pdf'
+        status_logbook:
+          type: string
+          description: Status terakhir logbook (Pending, Disetujui, Revisi).
+          example: Pending
+        created_at:
+          type: string
+          format: date-time
+          example: '2025-01-22T08:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2025-01-22T08:00:00Z'
+
     # 2. Skema ValidasiDetail (Model Detail Validasi oleh Dosen)
     ValidasiDetail:
       type: object
@@ -662,3 +1741,226 @@ components:
       scheme: bearer
       bearerFormat: JWT
   
+
+                StoreJadwalSeminarKPRequest:
+      required:
+        - title
+        - student_id
+        - status
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          example: 'Seminar KP - Sistem Informasi Akademik'
+        student_id:
+          type: integer
+          example: 1
+        scheduled_at:
+          type: string
+          format: date-time
+          example: '2024-12-25 10:00:00'
+          nullable: true
+        status:
+          type: string
+          enum:
+            - pending
+            - scheduled
+            - done
+            - cancelled
+          example: pending
+        notes:
+          type: string
+          example: 'Catatan tambahan untuk seminar'
+          nullable: true
+      type: object
+    StorePenilaianKPRequest:
+      required:
+        - mahasiswa_id
+        - nilai_laporan
+        - nilai_presentasi
+        - nilai_aktivitas_kp
+      properties:
+        mahasiswa_id:
+          description: 'ID mahasiswa'
+          type: integer
+          example: 1
+        nilai_laporan:
+          description: 'Nilai laporan KP (0-100)'
+          type: integer
+          maximum: 100
+          minimum: 0
+          example: 85
+        nilai_presentasi:
+          description: 'Nilai presentasi KP (0-100)'
+          type: integer
+          maximum: 100
+          minimum: 0
+          example: 80
+        nilai_aktivitas_kp:
+          description: 'Nilai aktivitas KP (0-100)'
+          type: integer
+          maximum: 100
+          minimum: 0
+          example: 90
+        bobot:
+          description: 'Bobot perhitungan: A (laporan 50%, presentasi 20%, aktivitas 30%) atau B (laporan 40%, presentasi 30%, aktivitas 30%)'
+          type: string
+          enum:
+            - A
+            - B
+          example: A
+          nullable: true
+      type: object
+    UpdateJadwalSeminarKPRequest:
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          example: 'Seminar KP - Sistem Informasi Akademik (Updated)'
+        student_id:
+          type: integer
+          example: 1
+        scheduled_at:
+          type: string
+          format: date-time
+          example: '2024-12-25 10:00:00'
+          nullable: true
+        status:
+          type: string
+          enum:
+            - pending
+            - scheduled
+            - done
+            - cancelled
+          example: scheduled
+        notes:
+          type: string
+          example: 'Catatan yang diperbarui'
+          nullable: true
+      type: object
+    UpdatePenilaianKPRequest:
+      required:
+        - nilai_laporan
+        - nilai_presentasi
+        - nilai_aktivitas_kp
+      properties:
+        nilai_laporan:
+          description: 'Nilai laporan KP (0-100)'
+          type: integer
+          maximum: 100
+          minimum: 0
+          example: 88
+        nilai_presentasi:
+          description: 'Nilai presentasi KP (0-100)'
+          type: integer
+          maximum: 100
+          minimum: 0
+          example: 85
+        nilai_aktivitas_kp:
+          description: 'Nilai aktivitas KP (0-100)'
+          type: integer
+          maximum: 100
+          minimum: 0
+          example: 92
+        bobot:
+          description: 'Bobot perhitungan: A (laporan 50%, presentasi 20%, aktivitas 30%) atau B (laporan 40%, presentasi 30%, aktivitas 30%)'
+          type: string
+          enum:
+            - A
+            - B
+          example: A
+          nullable: true
+      type: object
+    JadwalSeminarKP:
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 'Seminar KP - Sistem Informasi Akademik'
+        student:
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: 'John Doe'
+            email:
+              type: string
+              example: john@example.com
+          type: object
+        scheduled_at:
+          type: string
+          format: date-time
+          example: '2024-12-25 10:00:00'
+          nullable: true
+        status:
+          type: string
+          enum:
+            - pending
+            - scheduled
+            - done
+            - cancelled
+          example: pending
+        notes:
+          type: string
+          example: 'Catatan tambahan'
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2024-12-20 08:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2024-12-20 08:00:00'
+      type: object
+    PenilaianKP:
+      properties:
+        id:
+          type: integer
+          example: 1
+        mahasiswa_id:
+          type: integer
+          example: 1
+        nilai_laporan:
+          description: 'Nilai laporan (0-100)'
+          type: integer
+          example: 85
+        nilai_presentasi:
+          description: 'Nilai presentasi (0-100)'
+          type: integer
+          example: 80
+        nilai_aktivitas_kp:
+          description: 'Nilai aktivitas (0-100)'
+          type: integer
+          example: 90
+        nilai_akhir:
+          description: 'Nilai akhir hasil perhitungan dengan bobot'
+          type: integer
+          example: 86
+        nilai_mutu:
+          description: 'Konversi nilai akhir ke nilai mutu'
+          type: string
+          enum:
+            - A
+            - A-
+            - B+
+            - B
+            - B-
+            - C+
+            - C
+            - D
+            - E
+          example: A
+        created_at:
+          type: string
+          format: date-time
+          example: '2024-12-20 08:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2024-12-20 08:00:00'
+      type: object

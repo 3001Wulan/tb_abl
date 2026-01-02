@@ -2,29 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class PendaftaranKP extends Model
 {
     use HasFactory;
 
     protected $table = 'pendaftaran_kp';
-    
+
     protected $fillable = [
-        'nama_mahasiswa',
-        'nim',
-        'email',
-        'no_hp',
-        'jurusan',
-        'universitas',
-        'tema_kp',
-        'perusahaan',
+        'student_id',
+        'judul_kp',
+        'lokasi',
+        'periode',
+        'status',
+        'berkas',
         'krs',
         'transkrip',
-        'proposal',
-        'status_validasi',
-        'catatan_validasi'
+        'proposal'
     ];
 
     protected $dates = ['created_at', 'updated_at'];
