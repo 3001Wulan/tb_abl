@@ -72,7 +72,6 @@
   </div>
 
   <script>
-    // Toggle password
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     togglePassword.addEventListener('click', () => {
@@ -85,11 +84,9 @@
       }
     });
 
-    // Form submit
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      // Menampilkan Loading
       Swal.fire({
           title: 'Mendaftarkan Akun...',
           allowOutsideClick: false,
@@ -98,7 +95,7 @@
 
       const payload = {
           name: this.name.value,
-          nim: this.nim.value, // Kirim NIM ke server
+          nim: this.nim.value, 
           email: this.email.value,
           password: this.password.value,
           password_confirmation: this.password_confirmation.value

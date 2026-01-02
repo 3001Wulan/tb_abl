@@ -8,7 +8,6 @@ use App\Models\CatatanBimbingan;
 
 class KonsultasiController extends Controller {
 
-    // ==== Jadwal Bimbingan ====
     public function indexJadwal() {
         return response()->json(JadwalBimbingan::all());
     }
@@ -24,7 +23,6 @@ class KonsultasiController extends Controller {
         return response()->json($jadwal,201);
     }
 
-    // ==== Forum Konsultasi ====
     public function indexForum() {
         return response()->json(Forum::with('komentar')->get());
     }
@@ -45,7 +43,6 @@ class KonsultasiController extends Controller {
         return response()->json($komentar,201);
     }
 
-    // ==== Catatan Bimbingan ====
     public function indexCatatan($studentId) {
         return response()->json(CatatanBimbingan::where('student_id',$studentId)->get());
     }

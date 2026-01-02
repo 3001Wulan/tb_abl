@@ -10,6 +10,13 @@ servers:
     description: Laravel Dev Server
 
 paths:
+  /api/login:
+    post:
+      tags:
+        - Authentication
+      summary: 'Login User'
+      description: 'Gunakan email dan password untuk mendapatkan token.'
+      operationId: a3b306d14572d1f4bd6c064b3233e7b8
   /api/surat-pengantar:
     get:
       tags:
@@ -32,6 +39,21 @@ paths:
           application/json:
             schema:
               required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+              type: object
+      responses:
+        200:
+          description: 'Login Berhasil'
                 - pendaftaran_kp_id
                 - nama_perusahaan
               properties:
@@ -105,6 +127,24 @@ paths:
             application/json:
               schema:
                 properties:
+                  message:
+                    type: string
+                    example: 'Login berhasil'
+                  token:
+                    type: string
+                    example: 1|abc123token
+                  user:
+                    type: object
+                type: object
+        401:
+          description: 'Kredensial tidak valid'
+  /api/register:
+    post:
+      tags:
+        - Authentication
+      summary: 'Register Baru'
+      description: 'Mendaftarkan user sekaligus membuat record Student dengan ID yang identik.'
+      operationId: 8a56853624e025573120a09a4c75d468
                   status:
                     type: string
                     example: success
@@ -124,6 +164,32 @@ paths:
           application/json:
             schema:
               required:
+                - name
+                - email
+                - password
+                - nim
+              properties:
+                name:
+                  type: string
+                  example: Lann
+                email:
+                  type: string
+                  format: email
+                  example: lann@example.com
+                password:
+                  type: string
+                  format: password
+                  example: secret123
+                nim:
+                  type: string
+                  example: '2024001'
+              type: object
+      responses:
+        201:
+          description: 'User dan Student berhasil dibuat'
+      security:
+        -
+          bearerAuth: []
                 - jenis_informasi
                 - judul
               properties:
@@ -370,60 +436,69 @@ paths:
 
   # Logbook (Siswa) - PUT/DELETE (Update/Destroy)
   /api/logbook/{logbookId}:
-    post:
+    post: # Kita gunakan POST agar file_kegiatan (binary) terbaca oleh server
       tags:
         - 'Logbook (Siswa)'
-      summary: 'Siswa mengupdate Logbook yang belum divalidasi'
-      description: "Memperbarui data Logbook KP. Pembaruan hanya dapat dilakukan jika status Logbook masih 'Pending'. File kegiatan dapat diganti (opsional)."
+      summary: 'Update Logbook (Siswa)'
+      description: |
+        Endpoint ini digunakan untuk memperbarui data logbook yang belum divalidasi. 
+        **PENTING:** Karena menggunakan `multipart/form-data` untuk upload file, 
+        kamu harus mengirim request ini sebagai **POST** dan menyertakan field `_method: PUT`.
       operationId: updateLogbook
       parameters:
-        -
-          name: logbookId
+        - name: logbookId
           in: path
-          description: 'ID Logbook'
+          description: 'ID Logbook yang akan diperbarui'
           required: true
           schema:
             type: integer
-            example: 10
+            example: 14
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
+              type: object
               required:
+                - _method
                 - minggu_ke
                 - tanggal_mulai
                 - deskripsi_kegiatan
               properties:
+                _method:
+                  type: string
+                  description: 'Method spoofing untuk mengenali request sebagai PUT'
+                  example: 'PUT'
                 minggu_ke:
-                  description: 'Minggu ke kegiatan KP'
                   type: integer
-                  example: 4
+                  description: 'Minggu ke berapa'
+                  example: 25
                 tanggal_mulai:
                   type: string
                   format: date
-                  example: '2025-01-27'
+                  description: 'Format: YYYY-MM-DD'
+                  example: '2015-12-10'
                 deskripsi_kegiatan:
                   type: string
-                  example: 'Melakukan coding modul A.'
+                  example: 'bl'
                 file_kegiatan:
-                  description: 'File laporan/kegiatan (pdf, doc, docx, jpg, png) — opsional'
+                  description: 'Unggah file laporan baru (Opsional)'
                   type: string
                   format: binary
-              type: object
       responses:
         200:
           description: 'Logbook berhasil diperbarui'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogbookKP'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LogbookKP'
         403:
           description: 'Logbook sudah divalidasi dan tidak dapat diubah'
         404:
           description: 'Logbook tidak ditemukan'
-        422:
-          description: 'Kesalahan validasi'
     delete:
       tags:
         - 'Logbook (Siswa)'
@@ -642,28 +717,6 @@ paths:
         '404':
           description: 'Data pembimbing tidak ditemukan'
 
-  /api/kirim-notifikasi/{supervisionId}:
-    post:
-      tags:
-        - Pembimbingan
-      summary: 'Mengirim notifikasi penunjukan pembimbing.'
-      description: 'Mensimulasikan pengiriman notifikasi/email ke mahasiswa dan dosen terkait penunjukan.'
-      operationId: kirimNotifikasi
-      parameters:
-        - name: supervisionId
-          in: path
-          description: 'ID data Supervision yang akan dikirimkan notifikasi.'
-          required: true
-          schema:
-            type: integer
-            format: int64
-            example: 1
-      responses:
-        '200':
-          description: 'Notifikasi berhasil dikirim ke mahasiswa dan dosen'
-        '404':
-          description: 'Data pembimbing tidak ditemukan'
-
   # --- Surat Tugas Endpoints ---
   /api/buat-surat-tugas:
     post:
@@ -741,6 +794,61 @@ paths:
           description: 'Surat tugas pembimbing berhasil dihapus'
         '404':
           description: 'Surat tugas pembimbing tidak ditemukan'
+
+tags:
+  -
+    name: Authentication
+    description: Authentication'
+  - name: 'Logbook (Siswa)'
+    description: 'Operasi CRUD dan Tracking Logbook kegiatan KP oleh Mahasiswa.'
+  - name: 'Validasi Logbook'
+    description: 'API untuk melakukan validasi logbook mahasiswa'
+  - name: Pembimbingan
+    description: 'API untuk penentuan, pembaruan, dan notifikasi dosen pembimbing'
+  - name: 'Surat Tugas'
+    description: 'API untuk pembuatan dan pengelolaan surat tugas pembimbing'
+
+# --- KOMPONEN SKEMA (SCHEMAS) UNTUK REFERENSI YANG HILANG ---
+components:
+  schemas:
+    # 1. Skema LogbookKP (Model Dasar Logbook)
+    LogbookKP:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID unik Logbook.
+          example: 10
+        student_id:
+          type: integer
+          example: 5
+        minggu_ke:
+          type: integer
+          example: 3
+        tanggal_mulai:
+          type: string
+          format: date
+          example: '2025-01-20'
+        deskripsi_kegiatan:
+          type: string
+          example: 'Melakukan instalasi dan konfigurasi server.'
+        file_kegiatan_url:
+          type: string
+          nullable: true
+          description: URL ke file yang diunggah.
+          example: '/storage/logbook/5/week_3_file.pdf'
+        status_logbook:
+          type: string
+          description: Status terakhir logbook (Pending, Disetujui, Revisi).
+          example: Pending
+        created_at:
+          type: string
+          format: date-time
+          example: '2025-01-22T08:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2025-01-22T08:00:00Z'
 
 
   /api/jadwal-seminar-kp:
@@ -1625,6 +1733,14 @@ components:
               description: Daftar riwayat validasi yang diterima untuk logbook ini.
               items:
                 $ref: '#/components/schemas/ValidasiDetail'
+                # Tambahkan ini di dalam bagian components:
+    
+    securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
 
                 StoreJadwalSeminarKPRequest:
       required:

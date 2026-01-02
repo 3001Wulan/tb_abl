@@ -1,536 +1,296 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Mahasiswa Kerja Praktik</title>
+    <title>Dashboard Sistem KP</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<style>
-    .dark .dark\:divide-gray-700 > :not([hidden]) ~ :not([hidden]) {
-        border-color: rgba(55, 65, 81);
-    }
-    .dark .dark\:bg-gray-50 {
-        background-color: rgba(249, 250, 251);
-    }
-    .dark .dark\:bg-gray-100 {
-        background-color: rgba(243, 244, 246);
-    }
-    .dark .dark\:bg-gray-600 {
-        background-color: rgba(75, 85, 99);
-    }
-    .dark .dark\:bg-gray-700 {
-        background-color: rgba(55, 65, 81);
-    }
-    .dark .dark\:bg-gray-800 {
-        background-color: rgba(31, 41, 55);
-    }
-    .dark .dark\:bg-gray-900 {
-        background-color: rgba(17, 24, 39);
-    }
-    .dark .dark\:bg-red-700 {
-        background-color: rgba(185, 28, 28);
-    }
-    .dark .dark\:bg-green-700 {
-        background-color: rgba(4, 120, 87);
-    }
-    .dark .dark\:hover\:bg-gray-200:hover {
-        background-color: rgba(229, 231, 235);
-    }
-    .dark .dark\:hover\:bg-gray-600:hover {
-        background-color: rgba(75, 85, 99);
-    }
-    .dark .dark\:hover\:bg-gray-700:hover {
-        background-color: rgba(55, 65, 81);
-    }
-    .dark .dark\:hover\:bg-gray-900:hover {
-        background-color: rgba(17, 24, 39);
-    }
-    .dark .dark\:border-gray-100 {
-        border-color: rgba(243, 244, 246);
-    }
-    .dark .dark\:border-gray-400 {
-        border-color: rgba(156, 163, 175);
-    }
-    .dark .dark\:border-gray-500 {
-        border-color: rgba(107, 114, 128);
-    }
-    .dark .dark\:border-gray-600 {
-        border-color: rgba(75, 85, 99);
-    }
-    .dark .dark\:border-gray-700 {
-        border-color: rgba(55, 65, 81);
-    }
-    .dark .dark\:border-gray-900 {
-        border-color: rgba(17, 24, 39);
-    }
-    .dark .dark\:hover\:border-gray-800:hover {
-        border-color: rgba(31, 41, 55);
-    }
-    .dark .dark\:text-white {
-        color: rgba(255, 255, 255);
-    }
-    .dark .dark\:text-gray-50 {
-        color: rgba(249, 250, 251);
-    }
-    .dark .dark\:text-gray-100 {
-        color: rgba(243, 244, 246);
-    }
-    .dark .dark\:text-gray-200 {
-        color: rgba(229, 231, 235);
-    }
-    .dark .dark\:text-gray-400 {
-        color: rgba(156, 163, 175);
-    }
-    .dark .dark\:text-gray-500 {
-        color: rgba(107, 114, 128);
-    }
-    .dark .dark\:text-gray-700 {
-        color: rgba(55, 65, 81);
-    }
-    .dark .dark\:text-gray-800 {
-        color: rgba(31, 41, 55);
-    }
-    .dark .dark\:text-red-100 {
-        color: rgba(254, 226, 226);
-    }
-    .dark .dark\:text-green-100 {
-        color: rgba(209, 250, 229);
-    }
-    .dark .dark\:text-blue-400 {
-        color: rgba(96, 165, 250);
-    }
-    .dark .group:hover .dark\:group-hover\:text-gray-500 {
-        color: rgba(107, 114, 128);
-    }
-    .dark .group:focus .dark\:group-focus\:text-gray-700 {
-        color: rgba(55, 65, 81);
-    }
-    .dark .dark\:hover\:text-gray-100:hover {
-        color: rgba(243, 244, 246);
-    }
-    .dark .dark\:hover\:text-blue-500:hover {
-        color: rgba(59, 130, 246);
-    }
-
-    /* Custom style */
-    .header-right {
-        width: calc(100% - 3.5rem);
-    }
-    .sidebar:hover {
-        width: 16rem;
-    }
-    @media only screen and (min-width: 768px) {
-        .header-right {
-            width: calc(100% - 16rem);
-        }         
-    }
-</style>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
+    <style>
+        .dark .dark\:divide-gray-700 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(55, 65, 81); }
+        .dark .dark\:bg-gray-700 { background-color: rgba(55, 65, 81); }
+        .dark .dark\:bg-gray-800 { background-color: rgba(31, 41, 55); }
+        .dark .dark\:text-white { color: rgba(255, 255, 255); }
+        .header-right { width: calc(100% - 3.5rem); }
+        .sidebar:hover { width: 16rem; }
+        @media only screen and (min-width: 768px) { .header-right { width: calc(100% - 16rem); } }
+        .hidden { display: none; }
+    </style>
 </head>
-<body x-data="setup()" :class="{ 'dark': isDark }">
-    <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white dark:bg-gray-700 text-black dark:text-white">
+<body x-data="setup()" :class="{ 'dark': isDark }" class="bg-white dark:bg-gray-700 text-black dark:text-white antialiased">
+    <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 transition-colors duration-200">
 
-            @include('partials.header') 
-
-            @include('partials.sidebar')
-        <div class="h-full ml-14 mt-14 mb-10 md:ml-64">
+        @include('partials.header') 
         
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-                
-                <div class="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
-                    <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                        <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-blue-800 dark:text-gray-800 transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+        {{-- Memanggil 3 file sidebar yang berbeda --}}
+        @include('partials.sidebar-mahasiswa')
+        @include('partials.sidebar-dosen')
+        @include('partials.sidebar-admin')
+
+        <div class="h-full ml-14 mt-14 mb-10 md:ml-64">
+            
+            <div class="p-4 pb-0">
+                <h1 class="text-xl font-bold">Halo, <span id="display-name">...</span>!</h1>
+                <p class="text-xs text-gray-500 capitalize" id="display-role">Memuat akses...</p>
+            </div>
+
+            {{-- ========================================== --}}
+            {{-- VIEW: MAHASISWA --}}
+            {{-- ========================================== --}}
+            <div id="mahasiswa-view" class="hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 p-4 gap-4">
+                    <div class="bg-blue-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600 dark:border-gray-600 text-white font-medium group">
+                        <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
+                            <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-blue-800 dark:text-gray-800"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl" id="status-surat">Memuat...</p>
+                            <p>Status Surat Izin KP</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-2xl">Disetujui</p>
-                        <p>Status Surat Izin KP</p>
+                    
+                    <div class="bg-yellow-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-yellow-600 dark:border-gray-600 text-white font-medium group">
+                        <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
+                            <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-yellow-800 dark:text-gray-800"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path></svg>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl" id="total-bimbingan">0x</p>
+                            <p>Total Bimbingan</p>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="bg-yellow-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-yellow-600 dark:border-gray-600 text-white font-medium group">
-                    <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                        <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-yellow-800 dark:text-gray-800 transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path></svg>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-2xl">5x</p>
-                        <p>Total Bimbingan</p>
+
+                    <div class="bg-purple-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-purple-600 dark:border-gray-600 text-white font-medium group">
+                        <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
+                            <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-purple-800 dark:text-gray-800"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xl" id="dosen-pembimbing">Memuat...</p>
+                            <p>Dosen Pembimbing</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-green-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-green-600 dark:border-gray-600 text-white font-medium group">
-                    <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                        <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-green-800 dark:text-gray-800 transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <div class="grid grid-cols-1 lg:grid-cols-2 p-4 gap-4">
+                    <div class="bg-gray-50 dark:bg-gray-800 shadow-lg rounded">
+                        <div class="p-4 border-b dark:border-gray-700 font-semibold text-gray-900 dark:text-gray-50">Jadwal Seminar</div>
+                        <table class="w-full text-sm">
+                            <tbody class="divide-y dark:divide-gray-700">
+                                <tr><th class="p-3 text-left w-1/3">Status</th><td id="status-seminar" class="p-3">Memuat...</td></tr>
+                                <tr><th class="p-3 text-left">Tanggal</th><td id="tanggal-seminar" class="p-3">-</td></tr>
+                                <tr><th class="p-3 text-left">Ruangan</th><td id="ruangan-seminar" class="p-3">-</td></tr>
+                                <tr><th class="p-3 text-left">Penguji</th><td id="penguji-seminar" class="p-3">-</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="text-right">
-                        <p class="text-2xl">Bab 4</p>
-                        <p>Progress Laporan Terakhir</p>
+
+                    <div class="bg-gray-50 dark:bg-gray-800 shadow-lg rounded">
+                        <div class="p-4 border-b dark:border-gray-700 font-semibold text-gray-900 dark:text-gray-50">Logbook Terbaru</div>
+                        <div class="bg-gray-100 dark:bg-gray-600 px-4 py-2 text-xs uppercase font-bold text-gray-500 dark:text-gray-100">Aktivitas Terakhir</div>
+                        <ul id="list-aktivitas" class="p-2">
+                            <li class="italic p-2 text-sm">Memuat aktivitas...</li>
+                        </ul>
                     </div>
                 </div>
 
-                <div class="bg-purple-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-purple-600 dark:border-gray-600 text-white font-medium group">
-                    <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                        <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-purple-800 dark:text-gray-800 transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-2xl">B (Draft)</p>
-                        <p>Prediksi Nilai Akhir</p>
+                <div class="p-4">
+                    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-4 font-semibold text-lg border-b dark:border-gray-700">Riwayat Bimbingan</div>
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 dark:bg-gray-800 text-gray-500 uppercase text-xs">
+                                <tr><th class="p-4">Pembimbing</th><th class="p-4">Topik</th><th class="p-4">Status</th><th class="p-4">Tanggal</th></tr>
+                            </thead>
+                            <tbody id="riwayat-bimbingan" class="divide-y dark:divide-gray-700"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 p-4 gap-4">
-                
-                <div class="relative flex flex-col min-w-0 mb-4 lg:mb-0 break-words bg-gray-50 dark:bg-gray-800 w-full shadow-lg rounded">
-                    <div class="rounded-t mb-0 px-0 border-0">
-                        <div class="flex flex-wrap items-center px-4 py-2">
-                            <div class="relative w-full max-w-full flex-grow flex-1">
-                                <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50">Detail Kerja Praktik</h3>
-                            </div>
-                            <div class="relative w-full max-w-full flex-grow flex-1 text-right">
-                                <button class="bg-blue-500 dark:bg-gray-100 text-white active:bg-blue-600 dark:text-gray-800 dark:active:text-gray-700 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">Edit Data</button>
-                            </div>
+
+            {{-- ========================================== --}}
+            {{-- VIEW: ADMINISTRATOR --}}
+            {{-- ========================================== --}}
+            <div id="admin-view" class="hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
+                    <div class="bg-blue-600 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-800 dark:border-gray-600 text-white font-medium group">
+                        <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
+                            <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         </div>
-                        <div class="block w-full overflow-x-auto">
-                            <table class="items-center w-full bg-transparent border-collapse">
-                                <tbody>
-                                    <tr class="text-gray-700 dark:text-gray-100">
-                                        <th class="px-4 py-3 text-xs whitespace-nowrap text-left border-b dark:border-gray-700 w-1/3">Instansi</th>
-                                        <td class="px-4 py-3 text-sm border-b dark:border-gray-700 w-2/3">PT. Sinergi Tech</td>
+                        <div class="text-right">
+                            <p class="text-3xl font-black" id="stat-mhs">0</p>
+                            <p class="text-xs uppercase opacity-75">Total Mahasiswa</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-500 dark:bg-gray-800 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-amber-700 dark:border-gray-600 text-white font-medium group">
+                        <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
+                            <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-black" id="stat-surat-admin">0</p>
+                            <p class="text-xs uppercase opacity-75">Antrean Surat</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-600">
+                        <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+                            <h3 class="font-bold text-lg">Antrean Pendaftaran Mahasiswa (Terbaru)</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-100 dark:bg-gray-700 text-xs uppercase text-gray-400 font-bold">
+                                    <tr>
+                                        <th class="px-6 py-4">Mahasiswa</th>
+                                        <th class="px-6 py-4">Instansi</th>
+                                        <th class="px-6 py-4">Aksi</th>
                                     </tr>
-                                    <tr class="text-gray-700 dark:text-gray-100">
-                                        <th class="px-4 py-3 text-xs whitespace-nowrap text-left border-b dark:border-gray-700">Tanggal Mulai</th>
-                                        <td class="px-4 py-3 text-sm border-b dark:border-gray-700">01 September 2025</td>
-                                    </tr>
-                                    <tr class="text-gray-700 dark:text-gray-100">
-                                        <th class="px-4 py-3 text-xs whitespace-nowrap text-left border-b dark:border-gray-700">Tanggal Selesai (Rencana)</th>
-                                        <td class="px-4 py-3 text-sm border-b dark:border-gray-700">01 Desember 2025</td>
-                                    </tr>
-                                    <tr class="text-gray-700 dark:text-gray-100">
-                                        <th class="px-4 py-3 text-xs whitespace-nowrap text-left border-b dark:border-gray-700">Dosen Pembimbing</th>
-                                        <td class="px-4 py-3 text-sm border-b dark:border-gray-700">Dr. Andi Wijaya</td>
-                                    </tr>
-                                    <tr class="text-gray-700 dark:text-gray-100">
-                                        <th class="px-4 py-3 text-xs whitespace-nowrap text-left">Pembimbing Lapangan</th>
-                                        <td class="px-4 py-3 text-sm">Bapak Rahmat Setiawan</td>
-                                    </tr>
+                                </thead>
+                                <tbody id="admin-table-body" class="divide-y dark:divide-gray-700">
+                                    <tr><td colspan="3" class="text-center py-10 italic text-gray-400">Memproses data...</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-                
-                <div class="relative flex flex-col min-w-0 break-words bg-gray-50 dark:bg-gray-800 w-full shadow-lg rounded">
-                    <div class="rounded-t mb-0 px-0 border-0">
-                        <div class="flex flex-wrap items-center px-4 py-2">
-                            <div class="relative w-full max-w-full flex-grow flex-1">
-                                <h3 class="font-semibold text-base text-gray-900 dark:text-gray-50">Log Bimbingan Terbaru</h3>
-                            </div>
-                            <div class="relative w-full max-w-full flex-grow flex-1 text-right">
-                                <button class="bg-blue-500 dark:bg-gray-100 text-white active:bg-blue-600 dark:text-gray-800 dark:active:text-gray-700 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">Lihat Semua</button>
-                            </div>
-                        </div>
-                        <div class="block w-full">
-                            <div class="px-4 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-100 align-middle border border-solid border-gray-200 dark:border-gray-500 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                Minggu Ini
-                            </div>
-                            <ul class="my-1">
-                                <li class="flex px-4">
-                                    <div class="w-9 h-9 rounded-full flex-shrink-0 bg-red-500 my-2 mr-3">
-                                        <svg class="w-9 h-9 fill-current text-red-50" viewBox="0 0 36 36"><path d="M25 24H11a1 1 0 01-1-1v-5h2v4h12v-4h2v5a1 1 0 01-1 1zM14 13h8v2h-8z"></path></svg>
-                                    </div>
-                                    <div class="flex-grow flex items-center border-b border-gray-100 dark:border-gray-400 text-sm text-gray-600 dark:text-gray-100 py-2">
-                                        <div class="flex-grow flex justify-between items-center">
-                                            <div class="self-center">
-                                                <a class="font-medium text-gray-800 hover:text-gray-900 dark:text-gray-50 dark:hover:text-gray-100" href="#0" style="outline: none;">Dosen Pembimbing</a> memberikan **revisi Bab 4**.
-                                            </div>
-                                            <div class="flex-shrink-0 ml-2">
-                                                <a class="flex items-center font-medium text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500" href="#0" style="outline: none;">
-                                                    Aksi<span><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="transform transition-transform duration-500 ease-in-out"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="flex px-4">
-                                    <div class="w-9 h-9 rounded-full flex-shrink-0 bg-indigo-500 my-2 mr-3">
-                                        <svg class="w-9 h-9 fill-current text-indigo-50" viewBox="0 0 36 36"><path d="M18 10c-4.4 0-8 3.1-8 7s3.6 7 8 7h.6l5.4 2v-4.4c1.2-1.2 2-2.8 2-4.6 0-3.9-3.6-7-8-7zm4 10.8v2.3L18.9 22H18c-3.3 0-6-2.2-6-5s2.7-5 6-5 6 2.2 6 5c0 2.2-2 3.8-2 3.8z"></path></svg>
-                                    </div>
-                                    <div class="flex-grow flex items-center border-gray-100 text-sm text-gray-600 dark:text-gray-50 py-2">
-                                        <div class="flex-grow flex justify-between items-center">
-                                            <div class="self-center">
-                                                Anda telah **mengunggah** Log Harian 5.
-                                            </div>
-                                            <div class="flex-shrink-0 ml-2">
-                                                <a class="flex items-center font-medium text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500" href="#0" style="outline: none;">
-                                                    Lihat<span><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="transform transition-transform duration-500 ease-in-out"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                            <div class="px-4 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-100 align-middle border border-solid border-gray-200 dark:border-gray-500 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                Minggu Lalu
-                            </div>
-                            <ul class="my-1">
-                                <li class="flex px-4">
-                                    <div class="w-9 h-9 rounded-full flex-shrink-0 bg-green-500 my-2 mr-3">
-                                        <svg class="w-9 h-9 fill-current text-light-blue-50" viewBox="0 0 36 36"><path d="M23 11v2.085c-2.841.401-4.41 2.462-5.8 4.315-1.449 1.932-2.7 3.6-5.2 3.6h-1v2h1c3.5 0 5.253-2.338 6.8-4.4 1.449-1.932 2.7-3.6 5.2-3.6h3l-4-4zM15.406 16.455c.066-.087.125-.162.194-.254.314-.419.656-.872 1.033-1.33C15.475 13.802 14.038 13 12 13h-1v2h1c1.471 0 2.505.586 3.406 1.455zM24 21c-1.471 0-2.505-.586-3.406-1.455-.066.087-.125.162-.194.254-.316.422-.656.873-1.028 1.328.959.878 2.108 1.573 3.628 1.788V25l4-4h-3z"></path></svg>
-                                    </div>
-                                    <div class="flex-grow flex items-center border-gray-100 text-sm text-gray-600 dark:text-gray-50 py-2">
-                                        <div class="flex-grow flex justify-between items-center">
-                                            <div class="self-center">
-                                                <a class="font-medium text-gray-800 hover:text-gray-900 dark:text-gray-50 dark:hover:text-gray-100" href="#0" style="outline: none;">Pembimbing Lapangan</a> telah menyetujui <a class="font-medium text-gray-800 dark:text-gray-50 dark:hover:text-gray-100" href="#0" style="outline: none;">Log Mingguan 4</a>.
-                                            </div>
-                                            <div class="flex-shrink-0 ml-2">
-                                                <a class="flex items-center font-medium text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500" href="#0" style="outline: none;">
-                                                    Lihat<span><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="transform transition-transform duration-500 ease-in-out"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 p-4 gap-4 text-black dark:text-white">
-                <div class="md:col-span-2 xl:col-span-3">
-                    <h3 class="text-lg font-semibold">Progres Laporan Kerja Praktik</h3>
-                </div>
-                <div class="md:col-span-2 xl:col-span-1">
-                    <div class="rounded bg-gray-200 dark:bg-gray-800 p-3">
-                        <div class="flex justify-between py-1 text-black dark:text-white">
-                            <h3 class="text-sm font-semibold">Bab Awal (Bab 1-3)</h3> 
-                            <svg class="h-4 fill-current text-gray-600 dark:text-gray-500 cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 10a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4z" /></svg>
-                        </div>
-                        <div class="text-sm text-black dark:text-gray-50 mt-2">
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">
-                                Bab 1: Pendahuluan
-                                <div class="text-gray-500 dark:text-gray-200 mt-2 ml-2 flex justify-between items-start">
-                                    <span class="text-xs flex items-center text-green-600 dark:text-green-400">
-                                        <svg class="h-4 fill-current mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M11 4c-3.855 0-7 3.145-7 7v28c0 3.855 3.145 7 7 7h28c3.855 0 7-3.145 7-7V11c0-3.855-3.145-7-7-7zm0 2h28c2.773 0 5 2.227 5 5v28c0 2.773-2.227 5-5 5H11c-2.773 0-5-2.227-5-5V11c0-2.773 2.227-5 5-5zm25.234 9.832l-13.32 15.723-8.133-7.586-1.363 1.465 9.664 9.015 14.684-17.324z" /></svg>
-                                        **Selesai, Disetujui**
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">
-                                Bab 2: Landasan Teori
-                                <div class="text-gray-500 dark:text-gray-200 mt-2 ml-2 flex justify-between items-start">
-                                    <span class="text-xs flex items-center text-green-600 dark:text-green-400">
-                                        <svg class="h-4 fill-current mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M11 4c-3.855 0-7 3.145-7 7v28c0 3.855 3.145 7 7 7h28c3.855 0 7-3.145 7-7V11c0-3.855-3.145-7-7-7zm0 2h28c2.773 0 5 2.227 5 5v28c0 2.773-2.227 5-5 5H11c-2.773 0-5-2.227-5-5V11c0-2.773 2.227-5 5-5zm25.234 9.832l-13.32 15.723-8.133-7.586-1.363 1.465 9.664 9.015 14.684-17.324z" /></svg>
-                                        **Selesai, Disetujui**
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">
-                                Bab 3: Metode KP
-                                <div class="text-gray-500 dark:text-gray-200 mt-2 ml-2 flex justify-between items-start">
-                                    <span class="text-xs flex items-center text-green-600 dark:text-green-400">
-                                        <svg class="h-4 fill-current mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M11 4c-3.855 0-7 3.145-7 7v28c0 3.855 3.145 7 7 7h28c3.855 0 7-3.145 7-7V11c0-3.855-3.145-7-7-7zm0 2h28c2.773 0 5 2.227 5 5v28c0 2.773-2.227 5-5 5H11c-2.773 0-5-2.227-5-5V11c0-2.773 2.227-5 5-5zm25.234 9.832l-13.32 15.723-8.133-7.586-1.363 1.465 9.664 9.015 14.684-17.324z" /></svg>
-                                        **Selesai, Disetujui**
-                                    </span>
-                                </div>
-                            </div>
-                            <p class="mt-3 text-gray-600 dark:text-gray-400">Status: Selesai</p>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="rounded bg-gray-200 dark:bg-gray-800 p-3">
-                        <div class="flex justify-between py-1 text-black dark:text-white">
-                            <h3 class="text-sm font-semibold">Bab Inti (Bab 4-5)</h3> 
-                            <svg class="h-4 fill-current text-gray-600 dark:text-gray-500 cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 10a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4z" /></svg>
-                        </div>
-                        <div class="text-sm text-black dark:text-gray-50 mt-2">
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">
-                                Bab 4: Hasil dan Pembahasan
-                                <div class="flex justify-between items-start mt-2 ml-2 text-white text-xs">
-                                    <span class="bg-red-600 rounded p-1 text-xs flex items-center">
-                                        <svg class="h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2c-.8 0-1.5.7-1.5 1.5v.688C7.344 4.87 5 7.62 5 11v4.5l-2 2.313V19h18v-1.188L19 15.5V11c0-3.379-2.344-6.129-5.5-6.813V3.5c0-.8-.7-1.5-1.5-1.5zm-2 18c0 1.102.898 2 2 2 1.102 0 2-.898 2-2z" /></svg>
-                                        **Perlu Revisi (Urgent)**
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">
-                                Bab 5: Penutup
-                                <div class="text-gray-500 dark:text-gray-200 mt-2 ml-2 flex justify-between items-start">
-                                    <span class="text-xs flex items-center text-gray-500 dark:text-gray-400">
-                                        <svg class="h-4 fill-current mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 14h-2V9h2v5zm0 2h-2v2h2v-2zM4 21h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2zM4 5h16v14H4V5z"/></svg>
-                                        **Belum Diunggah**
-                                    </span>
-                                </div>
-                            </div>
-                            <p class="mt-3 text-gray-600 dark:text-gray-400">Status: Perlu Tindak Lanjut</p>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="rounded bg-gray-200 dark:bg-gray-800 p-3">
-                        <div class="flex justify-between py-1 text-black dark:text-white">
-                            <h3 class="text-sm font-semibold">Dokumen Final</h3>
-                            <svg class="h-4 fill-current text-gray-600 dark:text-gray-500 cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 10a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4z" /></svg>
-                        </div>
-                        <div class="text-sm text-black dark:text-gray-50 mt-2">
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">Laporan Akhir (Final)</div>
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">Surat Keterangan Selesai KP</div>
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">Nilai Dosen Pembimbing</div>
-                            <div class="bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded mt-1 border-b border-gray-100 dark:border-gray-900 cursor-pointer">Nilai Pembimbing Lapangan</div>
-                            <p class="mt-3 text-gray-600 dark:text-gray-400">Semua dokumen harus terpenuhi.</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <div class="mt-4 mx-4">
-                <div class="w-full overflow-hidden rounded-lg shadow-xs">
-                    <div class="w-full overflow-x-auto">
-                        <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-50 mb-2">Jadwal Bimbingan Terbaru</h3>
-                        <table class="w-full">
-                            <thead>
-                                <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                    <th class="px-4 py-3">Pembimbing</th>
-                                    <th class="px-4 py-3">Topik Terakhir</th>
-                                    <th class="px-4 py-3">Status</th>
-                                    <th class="px-4 py-3">Tanggal & Waktu</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                                <tr class="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                                    <td class="px-4 py-3 text-sm">Dr. Andi Wijaya (Dosen)</td>
-                                    <td class="px-4 py-3 text-sm">Revisi Bab 4 (Hasil)</td>
-                                    <td class="px-4 py-3 text-xs">
-                                        <span class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-700 dark:text-red-100"> Belum Selesai </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-sm">15-12-2025, 10:00 WIB</td>
-                                </tr>
-                                <tr class="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                                    <td class="px-4 py-3 text-sm">Bpk. Rahmat Setiawan (Lap.)</td>
-                                    <td class="px-4 py-3 text-sm">Laporan Mingguan 6</td>
-                                    <td class="px-4 py-3 text-xs">
-                                        <span class="px-2 py-1 font-semibold leading-tight text-yellow-700 bg-yellow-100 rounded-full"> Menunggu </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-sm">16-12-2025, 14:00 WIB</td>
-                                </tr>
-                                <tr class="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-400">
-                                    <td class="px-4 py-3 text-sm">Dr. Andi Wijaya (Dosen)</td>
-                                    <td class="px-4 py-3 text-sm">Review Bab 3</td>
-                                    <td class="px-4 py-3 text-xs">
-                                        <span class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100"> Selesai </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-sm">10-12-2025, 09:00 WIB</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-                        <span class="flex items-center col-span-3"> Total 5 Sesi Bimbingan Tercatat </span>
-                        <span class="col-span-2"></span>
-                        <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
-                            <nav aria-label="Table navigation">
-                                <ul class="inline-flex items-center">
-                                    <li>
-                                        <button class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple" aria-label="Previous">
-                                            <svg aria-hidden="true" class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                                <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" fill-rule="evenodd"></path>
-                                            </svg>
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">1</button>
-                                    </li>
-                                    <li>
-                                        <button class="px-3 py-1 text-white dark:text-gray-800 transition-colors duration-150 bg-blue-600 dark:bg-gray-100 border border-r-0 border-blue-600 dark:border-gray-100 rounded-md focus:outline-none focus:shadow-outline-purple">2</button>
-                                    </li>
-                                    <li>
-                                        <button class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple" aria-label="Next">
-                                            <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 20 20">
-                                                <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" fill-rule="evenodd"></path>
-                                            </svg>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </span>
-                    </div>
-                </div>
+            {{-- ========================================== --}}
+            {{-- VIEW: DOSEN --}}
+            {{-- ========================================== --}}
+            <div id="dosen-view" class="hidden p-4">
+                <h2 class="text-2xl font-bold">Panel Dosen</h2>
+                <p>Data bimbingan mahasiswa akan tampil di sini.</p>
             </div>
 
-            <div class="mt-8 mx-4">
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div class="p-6 mr-2 bg-gray-100 dark:bg-gray-800 sm:rounded-lg">
-                        <h1 class="text-4xl sm:text-5xl text-gray-800 dark:text-white font-extrabold tracking-tight">Butuh Bantuan?</h1>
-                        <p class="text-normal text-lg sm:text-2xl font-medium text-gray-600 dark:text-gray-400 mt-2">Hubungi Koordinator KP atau Dosen Anda</p>
-            
-                        <div class="flex items-center mt-8 text-gray-600 dark:text-gray-400">
-                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" class="w-8 h-8 text-gray-500">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <div class="ml-4 text-md tracking-wide font-semibold w-40">Ruang Koordinator KP</div>
-                        </div>
-            
-                        <div class="flex items-center mt-4 text-gray-600 dark:text-gray-400">
-                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" class="w-8 h-8 text-gray-500">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                            <div class="ml-4 text-md tracking-wide font-semibold w-40">Kontak Dosen Pembimbing Anda</div>
-                        </div>
-            
-                        <div class="flex items-center mt-4 text-gray-600 dark:text-gray-400">
-                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" class="w-8 h-8 text-gray-500">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            <div class="ml-4 text-md tracking-wide font-semibold w-40">koordinator.kp@univ.ac.id</div>
-                        </div>
-                    </div>
-                    <form class="p-6 flex flex-col justify-center">
-                        <div class="flex flex-col">
-                            <label for="name" class="hidden">Full Name</label>
-                            <input type="name" name="name" id="name" placeholder="Nama Anda (Optional)" class="w-100 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 dark:text-gray-50 font-semibold focus:border-blue-500 focus:outline-none" />
-                        </div>
-            
-                        <div class="flex flex-col mt-2">
-                            <label for="email" class="hidden">Email</label>
-                            <input type="email" name="email" id="email" placeholder="Subjek Pertanyaan" class="w-100 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 dark:text-gray-50 font-semibold focus:border-blue-500 focus:outline-none" />
-                        </div>
-            
-                        <div class="flex flex-col mt-2">
-                            <label for="message" class="hidden">Message</label>
-                            <textarea rows="4" name="message" id="message" placeholder="Tuliskan Pertanyaan atau Kendala Anda" class="w-100 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 dark:text-gray-50 font-semibold focus:border-blue-500 focus:outline-none"></textarea>
-                        </div>
-            
-                        <button type="submit" class="md:w-32 bg-blue-600 dark:bg-gray-100 text-white dark:text-gray-800 font-bold py-3 px-6 rounded-lg mt-4 hover:bg-blue-500 dark:hover:bg-gray-200 transition ease-in-out duration-300">Kirim Pesan</button>
-                    </form>
-                </div>
-            </div>
         </div>
-    </div>    
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
     <script>
-        const setup = () => {
-            const getTheme = () => {
-                if (window.localStorage.getItem('dark')) {
-                    return JSON.parse(window.localStorage.getItem('dark'))
-                }
-                return !!window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    (async function init() {
+        const token = localStorage.getItem('abl_token');
+        if (!token) { window.location.replace('/login'); return; }
+
+        try {
+            const profileRes = await fetch('/api/me', {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            if (!profileRes.ok) throw new Error("Unauthorized");
+            const user = await profileRes.json();
+            
+            document.getElementById('display-name').innerText = user.name;
+            document.getElementById('display-role').innerText = "Role: " + user.role;
+
+            // LOGIKA UNTUK MENAMPILKAN SIDEBAR & VIEW BERDASARKAN ROLE
+            if (user.role === 'admin') {
+                document.getElementById('admin-view').classList.remove('hidden');
+                document.getElementById('sidebar-admin')?.classList.remove('hidden');
+                fetchAdminData(token);
+            } else if (user.role === 'dosen') {
+                document.getElementById('dosen-view').classList.remove('hidden');
+                document.getElementById('sidebar-dosen')?.classList.remove('hidden');
+            } else {
+                document.getElementById('mahasiswa-view').classList.remove('hidden');
+                document.getElementById('sidebar-mahasiswa')?.classList.remove('hidden');
+                fetchMahasiswaData(token);
             }
 
-            const setTheme = (value) => {
-                window.localStorage.setItem('dark', value)
-            }
+        } catch (err) {
+            console.error(err);
+            window.location.replace('/login');
+        }
+    })();
 
-            return {
-                loading: true,
-                isDark: getTheme(),
-                toggleTheme() {
-                    this.isDark = !this.isDark
-                    setTheme(this.isDark)
-                },
+    async function fetchAdminData(token) {
+    try {
+        // PANGGIL URL INI (Pastikan route di api.php sudah benar)
+        const res = await fetch('/api/dashboard/kp', {
+            headers: { 
+                'Authorization': 'Bearer ' + token, 
+                'Accept': 'application/json' 
+            }
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            const data = result.data;
+
+            // Update Angka di Card
+            document.getElementById('stat-mhs').innerText = data.stats.total_mahasiswa;
+            document.getElementById('stat-surat-admin').innerText = data.stats.surat_pending;
+            
+            // Update Badge di Sidebar (lingkaran kuning)
+            const sideBadge = document.querySelector('.bg-yellow-50.rounded-full');
+            if (sideBadge) sideBadge.innerText = data.stats.surat_pending;
+
+            // Isi Tabel
+            const tbody = document.getElementById('admin-table-body');
+            if (data.pendaftar_terbaru.length > 0) {
+                tbody.innerHTML = data.pendaftar_terbaru.map(item => `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-900 transition duration-150">
+                        <td class="px-6 py-4 font-medium text-white">${item.nama_mahasiswa}</td>
+                        <td class="px-6 py-4 text-gray-400">${item.instansi}</td>
+                        <td class="px-6 py-4">
+            <a href="/admin/tentukanpembimbing?student_id=${item.id}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-xs inline-block">
+                Tentukan Pembimbing
+            </a>
+        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center py-10 text-gray-500 italic">Belum ada pendaftaran baru.</td></tr>';
             }
         }
-    </script> 
-</body>
+    } catch (e) { 
+        console.error("Admin data error:", e); 
+    }
+}
+    async function fetchMahasiswaData(token) {
+        try {
+            const res = await fetch('/api/dashboard/kp', {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            const response = await res.json();
+            const data = response.data;
+
+            document.getElementById('status-surat').innerText = data.status_surat;
+            document.getElementById('total-bimbingan').innerText = data.total_bimbingan + 'x';
+            document.getElementById('dosen-pembimbing').innerText = data.dosen_pembimbing?.nama || 'Belum diplot';
+
+            const activityList = document.getElementById('list-aktivitas');
+            if(data.log_terbaru) {
+                activityList.innerHTML = `
+                    <li class="p-2">
+                        <div class="text-sm"><b>Minggu ${data.log_terbaru.minggu_ke}:</b> ${data.log_terbaru.deskripsi.substring(0, 50)}...</div>
+                        <div class="text-xs text-gray-400">${data.log_terbaru.tanggal}</div>
+                    </li>`;
+            } else {
+                activityList.innerHTML = '<li class="p-2 text-sm italic">Belum ada logbook.</li>';
+            }
+
+            const tbody = document.getElementById('riwayat-bimbingan');
+            tbody.innerHTML = data.riwayat_bimbingan.length 
+                ? data.riwayat_bimbingan.map(item => `
+                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-900 border-b dark:border-gray-700">
+                        <td class="p-4">${item.pembimbing}</td>
+                        <td class="p-4">${item.topik}</td>
+                        <td class="p-4 text-xs"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full">Selesai</span></td>
+                        <td class="p-4">${item.tanggal}</td>
+                    </tr>`).join('')
+                : '<tr><td colspan="4" class="text-center p-4">Belum ada riwayat.</td></tr>';
+        } catch (e) { console.error("Mahasiswa data error", e); }
+    }
+
+    function setup() {
+        return {
+            isDark: localStorage.getItem('dark') === 'true',
+            toggleTheme() {
+                this.isDark = !this.isDark;
+                localStorage.setItem('dark', this.isDark);
+            }
+        }
+    }
+    </script>
+</body> 
 </html>
