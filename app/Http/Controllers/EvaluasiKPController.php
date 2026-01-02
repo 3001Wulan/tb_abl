@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class EvaluasiKPController extends Controller
 {
-    // Tambah evaluasi tengah KP
     public function store(Request $request)
     {
         $request->validate([
@@ -28,7 +27,6 @@ class EvaluasiKPController extends Controller
         ], 201);
     }
 
-    // Menampilkan semua evaluasi
     public function index()
     {
         $data = EvaluasiKP::with('logbook.student')->get();
@@ -38,8 +36,6 @@ class EvaluasiKPController extends Controller
             'data' => $data
         ], 200);
     }
-
-    // Detail evaluasi
     public function show($id)
     {
         $data = EvaluasiKP::with('logbook.student')->find($id);
@@ -56,7 +52,6 @@ class EvaluasiKPController extends Controller
         ], 200);
     }
 
-    // Update evaluasi
     public function update(Request $request, $id)
     {
         $data = EvaluasiKP::find($id);
@@ -75,7 +70,6 @@ class EvaluasiKPController extends Controller
         ], 200);
     }
 
-    // Hapus evaluasi
     public function destroy($id)
     {
         $data = EvaluasiKP::find($id);

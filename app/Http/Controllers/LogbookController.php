@@ -45,7 +45,6 @@ use App\Models\EvaluasiTengahKP;
  */
 class LogbookController extends Controller {
 
-    // ==== Layanan 3: Logbook / Monitoring KP (CRUD & Tracking oleh Siswa) ====
     
     /**
      * @OA\Post(
@@ -231,15 +230,13 @@ class LogbookController extends Controller {
     public function updateLogbook(Request $request, $logbookId)
     {
         $logbook = LogbookKP::findOrFail($logbookId);
-    
-        // Ini HANYA menolak jika statusnya sudah Disetujui
+
 if ($logbook->status === 'Disetujui') {
     return response()->json([
         'message' => 'Logbook sudah disetujui dan tidak dapat diubah.'
     ], 403);
 }
-    
-        // Validasi input
+
         $request->validate([
             'minggu_ke' => 'required|integer|unique:logbook_k_p_s,minggu_ke,' 
                 . $logbookId . ',id,student_id,' . $logbook->student_id,

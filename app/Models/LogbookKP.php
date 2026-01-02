@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class LogbookKP extends Model
 {
     use HasFactory;
-
+    protected $table = 'logbook_k_p_s';
     protected $fillable = [
         'student_id', 
         'minggu_ke', 

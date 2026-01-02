@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LogbookController;
+use App\Http\Controllers\Api\DashboardKpController;
+use App\Http\Controllers\PembimbingController;
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -52,3 +55,15 @@ Route::get('/api-docs.json', function () {
     return response()->file($path);
 });
 
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Semua bisa akses profil sendiri
+    Route::get('/me', [AuthController::class, 'me']);
+
+    // Hanya yang role-nya admin bisa akses ini
+    Route::get('/admin/dashboard-data', [AdminController::class, 'index'])->middleware('can:is-admin');
+});
+
+// Form tentukan dosen pembimbing
+Route::get('/admin/tentukanpembimbing', 
+[PembimbingController::class, 'formTentukanPembimbing']
+)->name('pembimbing.form');

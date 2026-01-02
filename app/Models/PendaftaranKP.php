@@ -50,4 +50,8 @@ class PendaftaranKP extends Model
     {
         return $this->proposal ? asset('storage/' . $this->proposal) : null;
     }
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'nim', 'nim');
+    }
 }

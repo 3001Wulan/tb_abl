@@ -8,7 +8,7 @@ use App\Http\Controllers\LogbookController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\DashboardKpController;
 
 
 use App\Http\Controllers\PendaftaranKPController;
@@ -50,7 +50,6 @@ Route::get('logbook/{studentId}', [LogbookController::class, 'indexLogbook']);
 Route::get('logbook/detail/{logbookId}', [LogbookController::class, 'showLogbook']);
 Route::put('logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
 Route::delete('logbook/{logbookId}', [LogbookController::class, 'destroyLogbook']);
-Route::post('/logbook/{logbookId}', [LogbookController::class, 'updateLogbook']);
 
 Route::post('/pendaftaran-kp', [PendaftaranKPController::class, 'daftar']);
 Route::post('/pendaftaran-kp/{id}/upload', [PendaftaranKPController::class, 'uploadBerkas']);
@@ -130,3 +129,8 @@ Route::middleware('auth:sanctum')->get('logbook', function (Request $request) {
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')
+    ->get('/dashboard/kp', [DashboardKpController::class, 'index']);
+Route::get('/students/{id}', [PembimbingController::class, 'showStudent']);
+Route::post('/pembimbing', [PembimbingController::class, 'tentukanPembimbing']);

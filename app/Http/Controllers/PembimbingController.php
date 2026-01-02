@@ -7,6 +7,9 @@ use App\Models\Supervision;
 use App\Models\SuratTugas;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Student;
+use App\Models\Lecturer;
+use App\Models\PendaftaranKp;
 
 /**
  * @OA\Tag(
@@ -20,11 +23,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class PembimbingController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | 1. Menentukan Dosen Pembimbing
-    |--------------------------------------------------------------------------
-    */
+   
     /**
      * @OA\Post(
      * path="/pembimbing",
@@ -55,30 +54,34 @@ class PembimbingController extends Controller
      * )
      */
     public function tentukanPembimbing(Request $request)
-    {
-        $request->validate([
-            'student_id'  => 'required|exists:students,id',
-            'lecturer_id' => 'required|exists:lecturers,id',
-            'judul'       => 'required|string'
-        ]);
+{
+    $request->validate([
+        'student_id'  => 'required|exists:students,id',
+        'lecturer_id' => 'required|exists:lecturers,id',
+        'judul'       => 'required|string'
+    ]);
 
-        $supervision = Supervision::create([
-            'student_id'  => $request->student_id,
-            'lecturer_id' => $request->lecturer_id,
-            'judul'       => $request->judul
-        ]);
+    $existing = Supervision::where('student_id', $request->student_id)->first();
 
+    if ($existing) {
         return response()->json([
-            'message' => 'Dosen pembimbing berhasil ditentukan',
-            'data'    => $supervision
-        ], 201);
+            'message' => 'Mahasiswa sudah memiliki dosen pembimbing'
+        ], 409);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 2. Membuat Surat Tugas Pembimbing
-    |--------------------------------------------------------------------------
-    */
+    $supervision = Supervision::create([
+        'student_id'  => $request->student_id,
+        'lecturer_id' => $request->lecturer_id,
+        'judul'       => $request->judul
+    ]);
+
+    return response()->json([
+        'message' => 'Dosen pembimbing berhasil ditentukan',
+        'data'    => $supervision
+    ], 201);
+}
+
+    
     /**
      * @OA\Post(
      * path="/surat-tugas",
@@ -149,11 +152,7 @@ class PembimbingController extends Controller
         ], 201);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 3. Download Surat Tugas Pembimbing
-    |--------------------------------------------------------------------------
-    */
+    
     /**
      * @OA\Get(
      * path="/surat-tugas/{id}",
@@ -184,21 +183,22 @@ class PembimbingController extends Controller
     public function downloadSuratTugas($id)
     {
         $surat = SuratTugas::find($id);
-
-        if (!$surat || !Storage::disk('local')->exists($surat->file_path)) {
+    
+        if (!$surat) {
             return response()->json([
-                'message' => 'File surat tugas tidak ditemukan'
+                'message' => 'Data surat tidak ditemukan di database'
             ], 404);
         }
-
-        return Storage::disk('local')->download($surat->file_path);
+    
+        if (!Storage::disk('local')->exists($surat->file_path)) {
+            return response()->json([
+                'message' => 'File fisik tidak ditemukan di folder storage/app/' . $surat->file_path
+            ], 404);
+        }
+    
+        return Storage::disk('local')->download($surat->file_path, $surat->nomor_surat . '.txt');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 4. Menghapus Surat Tugas Pembimbing
-    |--------------------------------------------------------------------------
-    */
     /**
      * @OA\Delete(
      * path="/surat-tugas/{id}",
@@ -244,62 +244,7 @@ class PembimbingController extends Controller
         ], 200);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 5. Notifikasi ke Mahasiswa dan Dosen
-    |--------------------------------------------------------------------------
-    */
-    /**
-     * @OA\Post(
-     * path="/notifikasi/{supervisionId}",
-     * operationId="kirimNotifikasi",
-     * tags={"Pembimbingan"},
-     * summary="Mengirim notifikasi penunjukan pembimbing.",
-     * description="Mensimulasikan pengiriman notifikasi/email ke mahasiswa dan dosen terkait penunjukan.",
-     * @OA\Parameter(
-     * name="supervisionId",
-     * in="path",
-     * required=true,
-     * description="ID data Supervision yang akan dikirimkan notifikasi.",
-     * @OA\Schema(type="integer", format="int64", example=1)
-     * ),
-     * @OA\Response(
-     * response=200,
-     * description="Notifikasi berhasil dikirim ke mahasiswa dan dosen",
-     * ),
-     * @OA\Response(
-     * response=404,
-     * description="Data pembimbing tidak ditemukan"
-     * )
-     * )
-     */
-    public function kirimNotifikasi($supervisionId)
-    {
-        $supervision = Supervision::with(['student', 'lecturer'])->find($supervisionId);
 
-        if (!$supervision) {
-            return response()->json([
-                'message' => 'Data pembimbing tidak ditemukan'
-            ], 404);
-        }
-
-        $notif = [
-            'pesan' => 'Penunjukan dosen pembimbing telah ditetapkan dan surat tugas telah diterbitkan.',
-            'dikirim_ke_mahasiswa' => $supervision->student->email,
-            'dikirim_ke_dosen'     => $supervision->lecturer->email,
-        ];
-
-        return response()->json([
-            'message' => 'Notifikasi berhasil dikirim ke mahasiswa dan dosen',
-            'data'    => $notif
-        ], 200);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 6. Update Dosen Pembimbing (dan buat ulang surat tugas jika diganti)
-    |--------------------------------------------------------------------------
-    */
     /**
      * @OA\Put(
      * path="/pembimbing/{id}",
@@ -355,14 +300,12 @@ class PembimbingController extends Controller
 
         $supervision->save();
 
-        // Hapus surat lama
         $oldSurat = SuratTugas::where('supervision_id', $supervision->id)->first();
         if ($oldSurat && Storage::disk('local')->exists($oldSurat->file_path)) {
             Storage::disk('local')->delete($oldSurat->file_path);
             $oldSurat->delete();
         }
 
-        // Buat surat baru
         $nomorSurat = "ST-" . strtoupper(Str::random(6));
         $folder = 'surat_tugas';
         if (!Storage::disk('local')->exists($folder)) {
@@ -395,4 +338,21 @@ class PembimbingController extends Controller
             ]
         ], 200);
     }
+    public function formTentukanPembimbing(Request $request)
+    {
+        $lecturers = Lecturer::all();
+
+        $pendaftaranKP = PendaftaranKp::with('student')->get();
+
+        return view('admin.tentukanpembimbing', compact('lecturers', 'pendaftaranKP'));
+    }
+public function showStudent($id)
+{
+    try {
+        $student = \App\Models\Student::findOrFail($id);
+        return response()->json($student);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Mahasiswa tidak ditemukan'], 404);
+    }
+}
 }
