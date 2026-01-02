@@ -8,10 +8,7 @@ use App\Models\PendaftaranKP;
 
 class PengajuanTempatKPController extends Controller
 {
-    /**
-     * 1. CREATE - Mahasiswa Mengajukan Tempat KP
-     * POST /api/pengajuan-tempat-kp
-     */
+   
     public function store(Request $request)
     {
         try {
@@ -60,10 +57,6 @@ class PengajuanTempatKPController extends Controller
         }
     }
 
-    /**
-     * 2. GET ALL - Lihat Semua Pengajuan Tempat KP
-     * GET /api/pengajuan-tempat-kp
-     */
     public function index()
     {
         try {
@@ -83,10 +76,6 @@ class PengajuanTempatKPController extends Controller
         }
     }
 
-    /**
-     * 3. GET DETAIL - Lihat Detail Pengajuan Tempat KP
-     * GET /api/pengajuan-tempat-kp/{id}
-     */
     public function show($id)
     {
         try {
@@ -110,10 +99,6 @@ class PengajuanTempatKPController extends Controller
         }
     }
 
-    /**
-     * 4. PERSETUJUAN INSTANSI - Update Status Persetujuan Instansi
-     * POST /api/pengajuan-tempat-kp/{id}/persetujuan-instansi
-     */
     public function persetujuanInstansi(Request $request, $id)
     {
         try {
@@ -176,10 +161,6 @@ class PengajuanTempatKPController extends Controller
         }
     }
 
-    /**
-     * 5. PERSETUJUAN JURUSAN - Update Status Persetujuan Jurusan
-     * POST /api/pengajuan-tempat-kp/{id}/persetujuan-jurusan
-     */
     public function persetujuanJurusan(Request $request, $id)
     {
         try {
@@ -236,10 +217,6 @@ class PengajuanTempatKPController extends Controller
         }
     }
 
-    /**
-     * 6. GET STATUS - Lihat Status Pengajuan
-     * GET /api/pengajuan-tempat-kp/{id}/status
-     */
     public function getStatus($id)
     {
         try {
@@ -270,10 +247,6 @@ class PengajuanTempatKPController extends Controller
         }
     }
 
-    /**
-     * 7. RESET - Reset Pengajuan ke Status Pending (Untuk Testing)
-     * POST /api/pengajuan-tempat-kp/{id}/reset
-     */
     public function reset($id)
     {
         try {
@@ -309,9 +282,6 @@ class PengajuanTempatKPController extends Controller
         }
     }
 
-    /**
-     * Helper: Generate Pesan Status
-     */
     private function getPesanStatus($status)
     {
         $pesan = [

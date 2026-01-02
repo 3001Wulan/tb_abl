@@ -9,6 +9,7 @@ use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\DashboardKpController;
+use App\Http\Controllers\BookController;
 
 
 use App\Http\Controllers\PendaftaranKPController;
@@ -139,40 +140,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/jadwal-seminar-me', [JadwalSeminarKPController::class, 'mySchedule']);
 });
 Route::prefix('informasi-kp')->group(function () {
-    // CREATE
     Route::post('/', [InformasiKPController::class, 'store']);
-
-    // READ
     Route::get('/', [InformasiKPController::class, 'index']);
     Route::get('/{id}', [InformasiKPController::class, 'show']);
 
-    // UPDATE
     Route::put('/{id}', [InformasiKPController::class, 'update']);
 
-    // DELETE
     Route::delete('/{id}', [InformasiKPController::class, 'destroy']);
 });
 Route::prefix('surat-pengantar')->group(function () {
 
-    // Lihat semua pengajuan surat
     Route::get('/', [SuratPengantarKPController::class, 'index']);
 
-    // Ajukan surat pengantar
     Route::post('/', [SuratPengantarKPController::class, 'store']);
 
-    // Lihat detail pengajuan surat
     Route::get('/{id}', [SuratPengantarKPController::class, 'show']);
 
-    // Buat PDF dari pengajuan surat
     Route::post('/{id}/buat-pdf', [SuratPengantarKPController::class, 'buatPdf']);
 
-    // Tandatangani surat oleh Kaprodi/Jurusan
     Route::post('/{id}/tandatangani', [SuratPengantarKPController::class, 'tandatangani']);
 
-    // Tolak pengajuan surat pengantar
     Route::post('/{id}/tolak', [SuratPengantarKPController::class, 'tolak']);
 
-    // Download surat pengantar
     Route::get('/{id}/download', [SuratPengantarKPController::class, 'download']);
 
     Route::get('/surat-pengantar/{id}/status', [SuratPengantarKPController::class, 'getStatus']);
@@ -183,3 +172,6 @@ Route::middleware('auth:sanctum')
     ->get('/dashboard/kp', [DashboardKpController::class, 'index']);
 Route::get('/students/{id}', [PembimbingController::class, 'showStudent']);
 Route::post('/pembimbing', [PembimbingController::class, 'tentukanPembimbing']);
+
+Route::get('/books', [BookController::class, 'index']);      // List buku
+Route::get('/books/{id}', [BookController::class, 'show']);  // Detail buku

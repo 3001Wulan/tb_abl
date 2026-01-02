@@ -7,12 +7,6 @@ use App\Models\ValidasiLogbook;
 use App\Models\LogbookKP;
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(
- *     name="Validasi Logbook",
- *     description="API untuk melakukan validasi logbook mahasiswa"
- * )
- */
 class ValidasiController extends Controller
 {
 

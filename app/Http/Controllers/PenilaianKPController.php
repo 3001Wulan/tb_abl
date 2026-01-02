@@ -66,13 +66,11 @@ class PenilaianKPController extends Controller
    public function index(Request $request)
 {
     $query = PenilaianKP::query();
-    
-    // Filter by mahasiswa_id (untuk mahasiswa lihat nilai sendiri)
+
     if ($request->has('mahasiswa_id')) {
         $query->where('mahasiswa_id', $request->mahasiswa_id);
     }
-    
-    // Filter by mutu
+
     if ($request->has('mutu')) {
         $mutu = strtoupper($request->mutu);
         $query->where('nilai_mutu', $mutu);

@@ -108,8 +108,6 @@ class LaporanKPController extends Controller
     $file = $request->file('file_laporan');
 
     $formatValid = $this->validateLaporanFormat($file);
-    
-    // Simpan nama file asli
     $originalFilename = $file->getClientOriginalName();
     
     $path = $file->store('laporan_kp', 'public');
@@ -117,7 +115,7 @@ class LaporanKPController extends Controller
     $data = LaporanKP::create([
         'mahasiswa_id'       => $request->mahasiswa_id,
         'file_laporan'       => $path,
-        'original_filename'  => $originalFilename,  // ← SIMPAN NAMA ASLI
+        'original_filename'  => $originalFilename,  
         'is_format_valid'    => $formatValid
     ]);
 
@@ -184,14 +182,13 @@ class LaporanKPController extends Controller
     $data = $query->get([
         'id',
         'mahasiswa_id',
-        'file_laporan',      // ← TAMBAHKAN INI
+        'file_laporan',      
         'original_filename',
         'is_format_valid',
         'created_at',
         'updated_at'
     ]);
 
-    // Return 200 dengan array kosong jika tidak ada data
     return response()->json([
         'success' => true,
         'data' => $data
@@ -353,14 +350,13 @@ class LaporanKPController extends Controller
         Storage::disk('public')->delete($data->file_laporan);
     }
 
-    // Simpan nama file asli
     $originalFilename = $file->getClientOriginalName();
     
     $path = $file->store('laporan_kp', 'public');
 
     $data->update([
         'file_laporan'       => $path,
-        'original_filename'  => $originalFilename,  // ← SIMPAN NAMA ASLI
+        'original_filename'  => $originalFilename,  
         'is_format_valid'    => $formatValid
     ]);
 
@@ -428,12 +424,12 @@ class LaporanKPController extends Controller
 
     public function showUploadPage()
 {
-    return view('mahasiswa.laporan-akhir'); // Dashboard/status
+    return view('mahasiswa.laporan-akhir'); 
 }
 
 public function showUploadForm()
 {
-    return view('mahasiswa.laporan-upload'); // Form upload
+    return view('mahasiswa.laporan-upload'); 
 }
 
 }

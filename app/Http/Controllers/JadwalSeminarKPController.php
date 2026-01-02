@@ -56,27 +56,25 @@ class JadwalSeminarKPController extends Controller
    public function index(Request $request)
 {
     $query = JadwalSeminarKp::with('student');
-    
-    // ✅ Tambahkan filter by student_id
+
     if ($request->has('student_id')) {
         $query->where('student_id', $request->student_id);
     }
     
     $jadwal = $query->paginate(15);
 
-    // Custom response untuk index (cuma beberapa field)
     return response()->json([
         'data' => $jadwal->map(function($item) {
             return [
                 'id' => $item->id,
                 'title' => $item->title,
-                'student' => [ // ✅ Tambahkan student info
+                'student' => [ 
                     'id' => $item->student->id,
                     'name' => $item->student->name,
                     'email' => $item->student->email,
                 ],
                 'scheduled_at' => $item->scheduled_at,
-                'status' => $item->status, // ✅ Tambahkan status
+                'status' => $item->status, 
                 'notes' => $item->notes,
             ];
         }),
