@@ -52,7 +52,7 @@
 
     <!-- Login Card -->
     <div class="relative w-full rounded-3xl px-8 py-12 bg-white/90 shadow-md backdrop-blur-sm">
-      <h2 class="block mt-3 text-xl text-gray-700 text-center font-bold mb-8">Login Mahasiswa</h2>
+      <h2 class="block mt-3 text-xl text-gray-700 text-center font-bold mb-8">Login</h2>
 
       <form id="loginForm">
         <!-- Email -->
